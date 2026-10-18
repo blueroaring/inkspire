@@ -1,6 +1,6 @@
-# 高中异闻：尖塔 0.1.0
+# 高中异闻：尖塔 0.2.0
 
-这是尖塔独立战斗游戏的首个公开发行版；此前内部测试编号不计入发行历史。
+尖塔独立战斗游戏。更新后沿用固定用户存档目录，支持游戏内存档迁移。
 
 - Godot 4.7.2，Compatibility 渲染器，Windows x86_64 / Android ARM64。
 - 官网：https://inkspire-game.freemyip.com/

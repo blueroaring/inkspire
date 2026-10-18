@@ -3,6 +3,7 @@ extends Node
 signal changed
 const DATA := preload("res://scripts/data/tower_data.gd")
 const REPORT_CRYPTO := preload("res://scripts/tower/report_crypto.gd")
+const TRANSFER := preload("res://scripts/tower/save_transfer.gd")
 const SAVE_ROOT := "user://tower"
 const STATE_KEYS := ["fight_profiles", "fight_progression", "fight_accessories", "fight_equipment", "fight_health", "fight_loadouts", "fight_formation", "fight_attributes", "fight_unlocked_attributes", "inventories"]
 var active := false
@@ -195,7 +196,6 @@ func replay_floor(floor_number: int, navigate: bool = true) -> bool:
 		data.health[id] = FightSystem.hero_max_hp(id)
 		if id == "zhoumingyuan": data.health["zhoumingyuan@math"] = FightSystem.hero_max_hp(id)
 	var floor_info := DATA.floor_data(floor_number, int(data.seed))
-	data.shop_visit = false
 	pending = floor_info.duplicate(true)
 	pending.mode = "replay"
 	pending.replay = true
@@ -301,7 +301,6 @@ func start_lesson(hero: String, final_exam: bool, navigate: bool = true) -> bool
 		error = "请先完成该角色的机制练习。"
 		return false
 	lesson_backup = capture_state()
-	data.shop_visit = false
 	var lesson: Dictionary = DATA.LESSONS[hero]
 	var team: Array = lesson.team.duplicate()
 	GameState.fight_equipment = {}
@@ -327,7 +326,9 @@ func _start(ids: Array, level: int, party: Array, navigate: bool) -> bool:
 		before.erase("retry_encounter")
 		pending.battle_start_data = before
 		pending.battle_start_state = capture_state()
-	if pending.mode in ["tower", "replay"]: data.shop_visit = false
+	# Only advancing the formal run closes the milestone shop. Lessons and
+	# replays preserve its exact stock, purchases and refresh count.
+	if pending.mode == "tower": data.shop_visit = false
 	# Save an interruption marker BEFORE combat. Reloading never grants a win.
 	data.in_progress = {"mode":pending.mode, "floor":pending.floor, "health":pending.battle_start_data.get("health", pending.get("start_health", data.health)).duplicate(true)}
 	data.in_progress.battle_data = pending.battle_start_data.duplicate(true)
@@ -338,6 +339,7 @@ func _start(ids: Array, level: int, party: Array, navigate: bool) -> bool:
 	save_game()
 	if not FightSystem.begin_encounter(ids, party, levels, false, false, "", true):
 		error = FightSystem.last_configuration_error
+		_restore_battle_start_state()
 		pending.clear()
 		data.erase("in_progress")
 		finish_lesson_session()
@@ -465,7 +467,6 @@ func settle(won: bool, abandoned: bool = false) -> Dictionary:
 			# The replay is recorded for statistics, but its only gameplay reward is XP.
 			data.battles = audit_battles
 			data.battle_count = audit_count
-			_restore_existing_shop_visit(int(pending.floor))
 			notice = "重演第 %d 层完成，每位参战角色获得 %d 经验。重演没有其他通关奖励，当前等级上限为 Lv.%d。" % [pending.floor, result.xp, cap()]
 		elif not lesson:
 			var first_clear: bool = not data.clears.has(str(pending.floor))
@@ -605,15 +606,6 @@ func open_shop(floor_number: int) -> void:
 	data.shop_visit = true
 	data.shop_arrival = true
 
-func _restore_existing_shop_visit(floor_number: int) -> void:
-	var shops: Dictionary = data.get("shops", {})
-	var key := str(floor_number)
-	if shops.has(key):
-		data.shops = shops
-		data.shop = shops[key]
-		data.shop_visit = true
-		data.shop_arrival = true
-
 func roll_stock(floor_number: int, refresh_count: int) -> Array:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = int(data.seed) + floor_number * 997 + refresh_count * 7919
@@ -640,7 +632,7 @@ func roll_stock(floor_number: int, refresh_count: int) -> Array:
 
 func refresh_shop() -> bool:
 	error = ""
-	if not shop_available(): error = "每过5层，阿姨才会开店。开始下一场战斗后，商店会关闭。"; return false
+	if not shop_available(): error = "每过5层，阿姨才会开店。挑战下一层后商店才会关闭，教学和重演不影响。"; return false
 	var shop: Dictionary = data.shop
 	var cost := 4 + int(shop.refreshes) * 3
 	if int(shop.refreshes) >= 2: error = "本层商店的两次刷新机会已用完。"; return false
@@ -654,7 +646,7 @@ func refresh_shop() -> bool:
 
 func buy(index: int) -> bool:
 	error = ""
-	if not shop_available(): error = "每过5层，阿姨才会开店。开始下一场战斗后，商店会关闭。"; return false
+	if not shop_available(): error = "每过5层，阿姨才会开店。挑战下一层后商店才会关闭，教学和重演不影响。"; return false
 	var stock: Array = data.shop.stock
 	if index < 0 or index >= stock.size() or stock[index].sold: return false
 	var offer: Dictionary = stock[index]
@@ -685,6 +677,8 @@ func path_for(selected_slot: int) -> String:
 
 func save_game() -> bool:
 	if read_only or data.is_empty(): return false
+	# Creation build and per-battle build retain their original provenance.
+	data.last_played_build = DATA.VERSION
 	data.state = capture_state() if lesson_backup.is_empty() else lesson_backup.duplicate(true)
 	data.saved_at = Time.get_datetime_string_from_system(true)
 	var sealed := REPORT_CRYPTO.seal({"data":data, "integrity":_report_integrity}, "save")
@@ -708,24 +702,20 @@ func read_save(selected_slot: int) -> Dictionary:
 	for suffix in ["", ".bak"]:
 		var path: String = path_for(selected_slot) + suffix
 		if not FileAccess.file_exists(path): continue
-		var parser := JSON.new()
-		if parser.parse(FileAccess.get_file_as_string(path)) != OK: continue
-		var parsed: Variant = parser.data
-		var integrity := "legacy"
-		if parsed is Dictionary and parsed.get("schema") == REPORT_CRYPTO.SCHEMA:
-			var decoded := REPORT_CRYPTO.open(parsed, "save")
-			if decoded.is_empty() or not decoded.get("data") is Dictionary: continue
-			integrity = "verified" if decoded.get("integrity") == "verified" else "legacy"
-			parsed = decoded.data
-		if parsed is Dictionary and int(parsed.get("version", 0)) == 1 and parsed.get("state") is Dictionary and parsed.get("health") is Dictionary and parsed.get("lessons") is Dictionary and parsed.get("battles") is Array:
-			# Never trust a provenance flag in an unsigned legacy save.
-			parsed["_loaded_integrity"] = integrity
-			return parsed
+		var parsed := TRANSFER.decode_save(TRANSFER.read_bounded(path))
+		if not parsed.is_empty(): return parsed
 	return {}
 
 func load_game(selected_slot: int) -> bool:
 	var loaded := read_save(selected_slot)
 	if loaded.is_empty(): error = "这里没有可读取的存档，备份也无法读取。"; return false
+	var prior_build := String(loaded.get("last_played_build", loaded.get("build", "")))
+	if not read_only and prior_build != DATA.VERSION:
+		if TRANSFER.backup_slot(selected_slot, "before-upgrade").is_empty():
+			error = "升级前备份失败，旧存档保持不变，请检查保存目录权限。"
+			return false
+		loaded.upgraded_from = prior_build
+		notice = "已自动接续旧版存档；升级前的存档与战斗记录已备份。覆盖或重命名程序都不会改变存档位置。"
 	enter()
 	slot = selected_slot
 	data = loaded
@@ -776,8 +766,7 @@ func load_game(selected_slot: int) -> bool:
 		data.battle_count += 1
 		data.erase("in_progress")
 	_ensure_roster_health()
-	save_game()
-	return true
+	return true if read_only else save_game()
 
 func append_journal(entry: Dictionary) -> void:
 	if read_only: return

@@ -5,41 +5,48 @@ const ALIASES := {"ink_wolf":"paper_large", "ink_wolf_echo":"paper_small"}
 ## Shared by the catalogue and tower floor preview; recommendations are optional tactics.
 const RECOMMENDATIONS := {
 	"paper_large":[["zhoumingyuan", "alyina"], "集中爆发，争取在半血后的分裂行动前击败本体；来不及击杀就先为全队铺盾，再处理两只小试卷兽。"],
-	"paper_small":[["zhoumingyuan", "chenmo"], "优先减员，减少敌方行动次数；多只同时在场时准备群体护盾，单体攻击可由陈默嘲讽承接。"],
-	"noise":[["zhoumingyuan", "alyina"], "优先击杀，避免睡眠不佳叠高；治疗被削弱时先用护盾承伤。净化可清除睡眠不佳。"],
+	"paper_small":[["li_anya", "chenmo"], "李安雅的「微薄声音」可用4段弹射压低多只小怪；弹射目标随机，残血漏网时补定向攻击。陈默用嘲讽承接单体攻击，群攻仍需全队护盾。"],
+	"noise":[["zhoumingyuan", "alyina", "li_anya"], "优先击杀，避免睡眠不佳叠高；艾莉娜与李安雅先用护盾承伤，治疗降低时不要只靠回血。净化可清除睡眠不佳；李安雅的全队净化需解锁「心理阴影」。"],
 	"cupid":[["alyina", "chenmo"], "提前铺盾，挡住箭矢的生命伤害可阻止爱意累积；爱意接近100时优先净化，避免迷魂误伤。"],
 	"zeus_dean":[["zhoumingyuan", "alyina"], "用高伤害、少段数的攻击减少标记触发；分散攻击者，带违纪标记的角色再次成为目标前先净化。护盾和嘲讽无法阻止重复标记处决。"],
 	"biting_book":[["zhoumingyuan", "chenmo"], "集中输出，避免天书叠满；在回合结束前用掉关键手牌，或净化知识遗忘，防止核心牌被消耗。陈默可承接连续攻击并反伤。"],
 	"nightmare":[["wangjiaqi", "zhoumingyuan"], "先处理恐惧蔓延：花1点能量消耗，或主动弃置，避免污染相邻手牌；被遮蔽的关键牌可通过交换位置移出遮蔽区。"],
-	"panic_throat":[["suwanqing", "alyina"], "第二阶段先清窃笑之影，并处理嘲弄牌；第三阶段趁两回合蓄力尽快输出，有驱散手段时削减自我封闭。转阶段会打断回合，不要把下一阶段爆发押在同一回合。"],
+	"panic_throat":[["zhoumingyuan", "alyina", "li_anya"], "第二阶段先清强制嘲讽的窃笑之影，并处理嘲弄牌；李安雅可用护盾和幻形调度协助清场。第三阶段趁2回合蓄力集中爆发；转阶段会打断回合，不要把下一阶段输出押在同一回合。"],
 	"snicker_shadow":[["zhoumingyuan", "alyina"], "优先击杀强制嘲讽的窃笑之影；嘲弄留到回合结束会伤害全队，及时弃置或消耗。"],
 	"gaokao_countdown":[["zhoumingyuan", "xumingming"], "在3次行动倒计时归零前集中击杀；无法及时击杀时预留护盾，防范目标及相邻队友一起受伤、眩晕。"],
-	"report_card":[["suwanqing", "chenmo"], "单段伤害有上限，优先多段攻击、毒爆和反伤，减少大单段伤害浪费；无实体时可用针对敌人的净化提前终结，否则备好两次复生的后续输出。"],
+	"report_card":[["zhoumingyuan", "li_anya", "alyina"], "用数学追击与李安雅「微薄声音」的多段伤害应对单段伤害上限；单个目标时弹射更集中。艾莉娜提供续航，并可用针对敌人的净化终结无实体；否则准备两次复生后的后续输出。"],
 	"quiet_hacker":[["zhoumingyuan", "xumingming"], "优先击杀以取回暂扣卡牌；木马牌必须先打出且效果无效，先处理它，再安排本回合爆发。"],
 	"magician_master":[["suwanqing", "chenmo"], "毒伤与反伤不受50%直接攻击闪避影响；先处理召唤的倒计时。被支配的角色要把牌换到首位再使用，并保护当前生命最低的队友。"],
 	"self_destructive_pain":[["zhoumingyuan", "alyina"], "利用半血开场尽早压低生命，降低后续按当前生命计算的威胁；麻木穿盾，保留治疗，并及时净化痛楚。"],
-	"infirmary_demon":[["zhoumingyuan", "alyina"], "隔离不可净化且受伤穿盾，重点治疗被隔离队友；其余角色尽量靠护盾减少恶魔吸血。利用特效药清理伤口，并在麻醉喷雾前把生命抬到一半以上。"],
-	"bullied_phantom":[["suwanqing", "chenmo"], "优先清理幻影，用多段攻击达到拳头5次、皮鞭3次、镣铐5次的消散计数；共享生命伤害也会削减本体。击败4只召唤物后使用站出来，反抗！清场并充满全队终结技。"],
-	"fist_phantom":[["suwanqing", "chenmo"], "用多段直接攻击凑满5次命中可使其消散；生命伤害同时削减首领生命，击败它还能为反抗援助充能。"],
-	"whip_phantom":[["suwanqing", "alyina"], "多段直接攻击凑满3次即可消散，优先处理以减少群攻和弹射压力；敌方行动前给全队铺盾。"],
+	"infirmary_demon":[["alyina", "li_anya", "zhoumingyuan"], "隔离不可净化且伤害穿盾，优先治疗被隔离者。艾莉娜负责续航，李安雅解锁「想要回家」后可补治疗；解锁「心理阴影」后可为全队净化并提供负面免疫，但不能解除隔离。利用特效药处理伤口，麻醉前把生命抬到一半以上。"],
+	"bullied_phantom":[["zhoumingyuan", "li_anya", "chenmo"], "数学周明远用追击补直接命中，李安雅用「微薄声音」分散削减幻影计数；需要抢先消散某一只时改用定向攻击。拳头5次、皮鞭3次、镣铐5次直接命中后消散，毒爆与反伤不扣这个计数。陈默负责承伤；击败4只召唤物后使用「站出来，反抗！」。"],
+	"fist_phantom":[["zhoumingyuan", "li_anya", "chenmo"], "以数学追击或李安雅4段弹射补直接命中，累计5次使其消散；多敌时弹射可能分散，不能保证一张牌击破。毒爆与反伤不扣命中计数。陈默用嘲讽与个人盾承伤；造成的生命伤害同时削减首领生命。"],
+	"whip_phantom":[["zhoumingyuan", "li_anya", "alyina"], "优先用直接多段攻击凑满3次使其消散，减少群攻与弹射压力。数学追击可补命中；李安雅弹射可能分散，关键时补定向攻击。艾莉娜提前为全队铺盾，毒爆与反伤不扣消散计数。"],
 	"bruised_hand":[["zhoumingyuan", "xumingming"], "优先爆发击杀强制嘲讽目标，阻止崩溃哭喊；它没有命中次数消散机制，也不与首领共享生命。"],
-	"shackle_phantom":[["suwanqing", "zhoumingyuan"], "行动前以多段直接攻击凑满5次使其消散，避免下一回合牌位封锁；主动击败可充能，释放锁缚后自行消散不会充能。"],
-	"claustrophobic_box":[["zhoumingyuan", "wangjiaqi"], "优先打低费、马上能起效的牌。满手牌时，打出一张就会补一张，可以接着出牌。尽快击败它，恢复手牌上限，免得窒息增加费用后无牌可打。"],
-	"math_exam":[["suwanqing", "zhoumingyuan"], "先打破开场护盾，再持续多次造成生命伤害，使函数退档；伤害完全被护盾吸收时不会退档，别只防守让函数升高。"],
-	"perfect_score":[["suwanqing", "chenmo"], "目标是累计100分，用多段攻击、毒爆和反伤增加有效命中；让每名角色都参与进攻，避免继续做！追击。分数在敌方回合开始时结算，达标后仍需做好防护再结束回合。"],
+	"shackle_phantom":[["zhoumingyuan", "li_anya"], "用数学追击、李安雅「微薄声音」累积直接命中，凑满5次使其消散；弹射会分散，需按剩余次数补定向攻击。毒爆与反伤不扣计数。主动击败可充能，释放锁缚后自行消散不会充能。"],
+	"claustrophobic_box":[["zhoumingyuan", "wangjiaqi", "li_anya"], "用低费、能立即起效的牌保持出牌。李安雅可用0费「迈入深渊」调度，幻形选择适合当前能量的牌。满手牌时打出一张会补一张；尽快击杀，防止窒息增加费用后无法出牌。"],
+	"math_exam":[["zhoumingyuan", "li_anya", "wangjiaqi"], "先破开场护盾，再用数学追击与李安雅多段弹射持续造成生命伤害，使函数退档；只有一个敌人时弹射集中。王嘉祺用附魔与调度辅助进攻；完全被盾吸收的伤害不会退档。"],
+	"perfect_score":[["zhoumingyuan", "li_anya", "chenmo"], "用数学追击和李安雅4段弹射累积有效命中；陈默可用已开启的反伤补分，但一次敌方多段动作只合并反伤一次。毒爆可计分，但苏婉青以叠毒引爆为主，不作为高频主攻推荐。让每名角色参与进攻，100分在敌方回合开始时结算，达标后也要防护。"],
 	"inverse_limit":[["zhoumingyuan", "alyina"], "第一阶段减少潮湿污染并准备转阶段群攻防护；第二阶段净化隐痛。第三阶段以高质量单段爆发为主，避免低伤多段堆高极限，并保护上一回合首张攻击牌的使用者。"],
-	"terminal_echo":[["zhoumingyuan", "alyina"], "集中击败每幕召唤物，不要攻击本体增加边缘；及时使用后退一步与转幕援助，净化虚无。坚毅可抵挡虚无离场；最后清完假黎明，打出不，我拒绝！完成胜利。"],
-	"whisper_silhouette":[["zhoumingyuan", "alyina"], "优先击杀以增加希望、降低边缘与倒计时；关键技能前先处理无意义，虚无接近5层时及时净化或准备坚毅。"],
-	"terminal_choir":[["zhoumingyuan", "alyina"], "尽快清掉合唱以阻止深渊污染牌堆、压低倒计时；保留净化处理虚无，转幕后及时使用协助牌。"],
-	"false_dawn":[["zhoumingyuan", "alyina"], "集中击杀，防止全队虚无堆到5层；净化或坚毅保护将离场的队友。两只全部消散后，立即打出不，我拒绝！。"],
+	"terminal_echo":[["zhoumingyuan", "alyina", "li_anya"], "集中击败每幕召唤物，不要攻击本体增加边缘；及时使用后退一步与转幕援助，净化虚无。坚毅可抵挡虚无离场；李安雅可用「心理阴影」全队净化与免疫、用检索取回援助牌；涅槃会让队友暂时离场，需先确认可独自处理当前阶段。最后清完假黎明，打出不，我拒绝！完成胜利。"],
+	"whisper_silhouette":[["zhoumingyuan", "alyina", "li_anya"], "优先击杀以增加希望、降低边缘与倒计时；关键技能前先处理无意义，虚无接近5层时及时净化或准备坚毅。"],
+	"terminal_choir":[["zhoumingyuan", "alyina", "li_anya"], "尽快清掉合唱以阻止深渊污染牌堆、压低倒计时；保留净化处理虚无，转幕后及时使用协助牌。"],
+	"false_dawn":[["zhoumingyuan", "alyina", "li_anya"], "集中击杀，防止全队虚无堆到5层；净化或坚毅保护将离场的队友。两只全部消散后，立即打出不，我拒绝！。"],
 }
+
+const MATH_RECOMMENDATIONS := ["report_card", "bullied_phantom", "fist_phantom", "whip_phantom", "shackle_phantom", "math_exam", "perfect_score"]
+
+static func recommended_name(enemy_id: String, hero_id: String) -> String:
+	var label := String(FightData.hero(hero_id).name)
+	if hero_id == "zhoumingyuan": label += "（数学）" if enemy_id in MATH_RECOMMENDATIONS else "（无极）"
+	return label
 
 static func recommendation(id: String) -> String:
 	id = String(ALIASES.get(id, id))
 	if not RECOMMENDATIONS.has(id): return ""
 	var guide: Array = RECOMMENDATIONS[id]
 	var names: Array[String] = []
-	for hero in guide[0]: names.append(String(FightData.hero(hero).name))
+	for hero in guide[0]: names.append(recommended_name(id, String(hero)))
 	return "推荐角色：%s\n应对方式：%s" % [" / ".join(names), guide[1]]
 
 const ASSISTS := {
@@ -119,7 +126,7 @@ const ENTRIES := {
 	"report_card": {
 		"kind":"精英", "bio":"李安雅班级一模的成绩单烧成灰，又在排名被念出时重新拼合。",
 		"traits":"单段伤害上限 · 两次复生 · 诅咒牌",
-		"skills":[["排名宣读", "攻击一名角色，向弃牌堆加入2张排名；排名留在手中到回合结束会施加1回合颤栗，使受到的伤害增加50%。"], ["灰烬回响", "随机弹射攻击；初始3段，每复生一次增加1段。"]],
+		"skills":[["排名宣读", "攻击一名角色，向弃牌堆加入2张排名：排名留在手中到回合结束会施加1回合颤栗，使受到的伤害增加50%。"], ["灰烬回响", "随机弹射攻击；初始3段，每复生一次增加1段。"]],
 		"mechanics":"每段攻击对它造成的伤害有上限。前两次生命耗尽会进入无实体状态，执行无实体意图后立即分别以50%和25%最大生命复生，本次行动不攻击；无实体时无法直接攻击，可以用针对敌人的净化提前终结。"
 	},
 	"quiet_hacker": {

@@ -191,7 +191,7 @@ func _lobby() -> void:
 	var recommended: Array[String] = []
 	for id in floor_info.enemies:
 		for hero in BESTIARY.RECOMMENDATIONS.get(id, [[], ""])[0]:
-			var hero_name := String(FightData.hero(hero).name)
+			var hero_name := BESTIARY.recommended_name(String(id), String(hero))
 			if hero_name not in recommended: recommended.append(hero_name)
 	text("推荐：" + " / ".join(recommended), Rect2(770, 412, 730, 32), 21, GOLD).name = "TowerFloorRecommendations"
 	button("查看逐怪打法", Rect2(1558, 408, 260, 40), func(): _floor_recommendations(floor_info)).name = "TowerFloorStrategy"
@@ -201,20 +201,22 @@ func _lobby() -> void:
 	if cleared:
 		button("重置到本层前", Rect2(1240, 452, 210, 42), _confirm_reset, false)
 	text("出战顺序", Rect2(746, 526, 300, 40), 28)
-	button("新手教程", Rect2(1195, 522, 240, 52), func(): _open_tutorial(true))
-	button("角色 / 卡组 / 图鉴", Rect2(1465, 522, 390, 52), _characters).name = "TowerCharacters"
+	button("新手教程", Rect2(1195, 522, 200, 52), func(): _open_tutorial(true))
+	button("角色系统与战斗百科  →", Rect2(1420, 522, 435, 52), _characters, true).name = "TowerCharacters"
+	text("配技能、装遗物、查怪物与道具，出战前先来看看", Rect2(1100, 575, 750, 24), 16, MUTED)
 	var team := FightSystem.formation_slots()
 	for i in 4:
 		var x := 740 + i * 283
 		var id := String(team[i])
-		var tile := button("", Rect2(x, 588, 265, 271), func(): _formation_picker(i), false)
+		var tile := button("", Rect2(x, 600, 265, 271), func(): _formation_picker(i), false)
 		tile.name = "FormationSlot_%d" % i
 		if id.is_empty():
 			text("＋\n选择队员", Rect2(20, 80, 225, 120), 30, MUTED, tile).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			continue
 		M.identity_button(tile, id, false)
 		tile.get_node("SurfaceArt").show()
-		portrait(FightData.hero(id).portrait, Rect2(30, 10, 205, 120), tile)
+		portrait(FightData.hero(id).portrait, Rect2(30, 10, 205, 92 if id == "zhoumingyuan" else 120), tile)
+		if id == "zhoumingyuan": _form_switch(tile, Rect2(14, 103, 237, 34))
 		text(FightData.hero(id).name, Rect2(20, 134, 225, 40), 29, TEXT, tile).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		text("%02d  /  Lv.%d" % [i + 1, FightProgression.hero_level(id)], Rect2(20, 178, 225, 30), 19, GOLD, tile).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_formation_health(tile, id, Rect2(16, 208, 233, 54))
@@ -222,7 +224,7 @@ func _lobby() -> void:
 	button("恢复 · %d 次" % TowerRun.recovery_charges(), Rect2(740, 887, 225, 57), _recovery_picker, true)
 	if TowerRun.shop_available():
 		button("拜访小卖铺阿姨", Rect2(982, 887, 270, 57), func(): page = "shop"; _refresh())
-	text("每过5层，可以找小卖铺阿姨买东西。\n开始下一场战斗后，商店就会关闭。", Rect2(1280, 878, 550, 78), 20, MUTED)
+	text("每过5层可以找阿姨补给。\n挑战下一层才关店，教学和重演不影响。", Rect2(1280, 878, 550, 78), 20, MUTED)
 	var warning := TowerRun.formation_warning()
 	if not warning.is_empty(): TowerRun.notice = warning
 
@@ -249,6 +251,27 @@ func _floor_enemies(floor_info: Dictionary) -> void:
 		text("Lv.%d%s" % [floor_info.level, "  ·  第%d战" % (i + 1) if sequential else ""], Rect2(94, 46, width - 104, 30), 21, GOLD, tile).name = "EnemyLevel"
 		if sequential and i < enemies.size() - 1:
 			text("→", Rect2(i * (width + gap) + width, 27, gap, 36), 24, GOLD, row).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+func _form_switch(parent: Control, rect: Rect2, picker_slot: int = -1) -> void:
+	var current := FightSystem.current_attribute("zhoumingyuan")
+	for i in 2:
+		var form: String = ["none", "math"][i]
+		var choice := button(("● " if form == current else "切换 ") + FightData.attr_name(form), Rect2(rect.position + Vector2(i * (rect.size.x + 6) / 2, 0), Vector2((rect.size.x - 6) / 2, rect.size.y)), func():
+			if not FightSystem.set_attribute("zhoumingyuan", form): return
+			TowerRun.save_game()
+			TowerRun.notice = "周明远已切换为%s形态，卡组已同步；仅对应形态的专武可装备。" % FightData.attr_name(form)
+			if picker_slot >= 0:
+				var overlay := canvas.find_child("TowerFormationPicker", true, false)
+				if is_instance_valid(overlay):
+					canvas.remove_child(overlay)
+					overlay.queue_free()
+			_refresh()
+			if picker_slot >= 0: _formation_picker(picker_slot)
+		, current == form, false, parent)
+		choice.name = "FormationForm_" + form
+		choice.mouse_filter = Control.MOUSE_FILTER_STOP
+		choice.add_theme_font_size_override("font_size", 16)
+		choice.tooltip_text = "切换形态会同步独立卡组与剩余生命；不匹配的形态专武会卸下，可在角色系统重新装备。"
 
 func _formation_health(parent: Control, id: String, rect: Rect2) -> void:
 	var current := TowerRun.health(id)
@@ -399,7 +422,8 @@ func _formation_picker(slot_index: int) -> void:
 		pane.add_child(tile)
 		var role := {"zhoumingyuan":"输出 / 绝境", "alyina":"治疗 / 守护", "chenmo":"防御 / 反伤", "xumingming":"输出 / 蓄势", "wangjiaqi":"辅助 / 附魔", "suwanqing":"输出 / 毒", "liudanya":"辅助 / 构图", "li_anya":"幻形 / 涅槃"}
 		var team_slot := team.find(id)
-		text(role[id] + (" · 队中%d" % (team_slot + 1) if team_slot >= 0 else ""), Rect2(20, 99, 290, 34), 21, GOLD, tile)
+		if id == "zhoumingyuan": _form_switch(tile, Rect2(20, 99, 290, 34), slot_index)
+		else: text(role[id] + (" · 队中%d" % (team_slot + 1) if team_slot >= 0 else ""), Rect2(20, 99, 290, 34), 21, GOLD, tile)
 		_formation_health(tile, id, Rect2(20, 138, 290, 54))
 	button("移出队伍", Rect2(40, 655, 300, 52), func():
 		var next := FightSystem.formation_slots()
@@ -410,7 +434,8 @@ func _formation_picker(slot_index: int) -> void:
 		_refresh()
 		_resume_tutorial(), false, false, pane)
 	button("完成编队", Rect2(1102, 655, 330, 52), func(): overlay.queue_free(); _resume_tutorial(), true, false, pane)
-	button("角色系统 · 改技能 / 图鉴", Rect2(570, 655, 500, 52), _characters, false, false, pane).name = "FormationCharacters"
+	text("角色系统：调整卡组与装备，查阅怪物、遗物、道具图鉴及机制", Rect2(40, 599, 1380, 34), 22, GOLD, pane)
+	button("进入角色系统与战斗百科  →", Rect2(570, 655, 500, 52), _characters, true, false, pane).name = "FormationCharacters"
 
 func _launch() -> void:
 	if not TowerRun.start_floor(chosen_floor): TowerRun.notice = TowerRun.error; _refresh()
@@ -452,7 +477,7 @@ func _lesson(final_exam: bool) -> void:
 func _shop() -> void:
 	if not TowerRun.shop_available():
 		text("尚未抵达补给点", Rect2(770, 300, 1020, 65), 36, GOLD)
-		text("击败第5、10、15…层的守关敌人后，阿姨会在该层等你。\n开始下一场战斗后，本次补给结束。", Rect2(770, 400, 1020, 120), 25)
+		text("击败第5、10、15…层的守关敌人后，阿姨会在该层等你。\n挑战下一层后，本次补给结束；教学和重演不影响。", Rect2(770, 400, 1020, 120), 25)
 		button("返回攀登", Rect2(770, 620, 350, 65), func(): page = "lobby"; _refresh(), true)
 		return
 	portrait("res://assets/graphics/tower/merchant.webp", Rect2(40, 300, 650, 680))
@@ -514,7 +539,7 @@ func _equipment_detail(id: String) -> void:
 
 func _saves() -> void:
 	text("攀登记录", Rect2(746, 215, 1080, 54), 34, GOLD)
-	text("可保存三份进度 · 战斗结束或购物后自动保存 · 中断战斗后从战前继续", Rect2(746, 277, 1080, 40), 21, MUTED)
+	text("更新后直接点继续：同一电脑覆盖或重命名 EXE 均会接续旧档。\n换电脑可导入 0.1.0 的 slot_*.json，或新版导出的迁移包。", Rect2(746, 277, 1080, 63), 21, MUTED)
 	for i in 3:
 		var selected_slot := i + 1
 		var saved := TowerRun.read_save(selected_slot)
@@ -522,14 +547,59 @@ func _saves() -> void:
 		panel(Rect2(740, y, 1114, 145))
 		text("%02d  /  %s" % [selected_slot, saved.get("nickname", "空存档")], Rect2(770, y + 18, 630, 42), 28, GOLD)
 		text("尚未开始" if saved.is_empty() else "最高 %d 层  ·  %d 场战斗  ·  %s UTC" % [saved.highest, saved.battle_count, saved.get("saved_at", "")], Rect2(770, y + 73, 700, 37), 20, MUTED)
-		button("继续", Rect2(1485, y + 24, 145, 48), func():
+		button("继续", Rect2(1435, y + 24, 115, 48), func():
 			if TowerRun.load_game(selected_slot): page = "lobby"; chosen_floor = int(TowerRun.data.highest) + 1
 			else: TowerRun.notice = TowerRun.error
 			_refresh(), true, saved.is_empty())
-		button("新建存档", Rect2(1650, y + 24, 170, 48), func(): _new_dialog(selected_slot, not saved.is_empty()))
+		button("导入", Rect2(1565, y + 24, 110, 48), func(): _import_save(selected_slot)).name = "ImportSlot_%d" % selected_slot
+		button("新建存档", Rect2(1690, y + 24, 140, 48), func(): _new_dialog(selected_slot, not saved.is_empty()))
+	text("迁移会保留战斗记录并备份原槽位。旧版请连同同目录的 *_battles.jsonl 一起复制。", Rect2(746, 842, 1090, 35), 19, MUTED)
 	button("保存当前记录", Rect2(740, 891, 340, 56), func():
 		TowerRun.notice = "存档已保存。" if TowerRun.save_game() else TowerRun.error
 		_refresh(), true, TowerRun.data.is_empty())
+	button("导出迁移包", Rect2(1100, 891, 320, 56), _export_save, false, TowerRun.data.is_empty()).name = "ExportSaveTransfer"
+	button("打开存档文件夹", Rect2(1440, 891, 414, 56), func():
+		DirAccess.make_dir_recursive_absolute(TowerRun.save_root)
+		OS.shell_open(ProjectSettings.globalize_path(TowerRun.save_root)))
+
+func _export_save() -> void:
+	var dialog := FileDialog.new()
+	dialog.title = "导出可迁移的尖塔存档"
+	dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
+	dialog.access = FileDialog.ACCESS_FILESYSTEM
+	dialog.filters = PackedStringArray(["*.inksave ; 尖塔迁移包"])
+	dialog.current_dir = OS.get_system_dir(OS.SYSTEM_DIR_DOCUMENTS)
+	dialog.current_file = "InkSpire-slot%d.inksave" % TowerRun.slot
+	dialog.file_selected.connect(func(path: String):
+		TowerRun.notice = "迁移包已导出，包含当前存档与完整战斗记录。" if TowerRun.TRANSFER.export_bundle(path) else TowerRun.error
+		dialog.queue_free()
+		_refresh())
+	dialog.canceled.connect(dialog.queue_free)
+	add_child(dialog)
+	dialog.popup_centered(Vector2i(960, 640))
+
+func _import_save(selected_slot: int) -> void:
+	var dialog := FileDialog.new()
+	dialog.title = "导入到第 %d 槽：旧版存档或迁移包" % selected_slot
+	dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILE
+	dialog.access = FileDialog.ACCESS_FILESYSTEM
+	dialog.filters = PackedStringArray(["*.inksave,*.json,*.bak ; 尖塔存档或迁移包"])
+	dialog.current_dir = OS.get_system_dir(OS.SYSTEM_DIR_DOCUMENTS)
+	dialog.file_selected.connect(func(path: String):
+		dialog.queue_free()
+		var imported := TowerRun.TRANSFER.inspect_import(path)
+		if imported.is_empty():
+			TowerRun.notice = "无法读取此文件：请选择尖塔存档或迁移包；原有记录未改动。"
+			_refresh()
+			return
+		var saved: Dictionary = imported.save
+		confirm("将「%s」的最高 %d 层进度导入第 %d 槽。\n该槽原有记录会先备份，再替换；其他槽位不受影响。\n来源版本：%s" % [saved.nickname, saved.highest, selected_slot, saved.get("last_played_build", saved.get("build", "旧版"))], func():
+			if TowerRun.TRANSFER.import_bundle(path, selected_slot): chosen_floor = int(TowerRun.data.highest) + 1
+			else: TowerRun.notice = TowerRun.error
+			_refresh()))
+	dialog.canceled.connect(dialog.queue_free)
+	add_child(dialog)
+	dialog.popup_centered(Vector2i(960, 640))
 
 func _new_dialog(selected_slot: int, overwrite: bool) -> void:
 	var dialog := ConfirmationDialog.new()
@@ -555,7 +625,7 @@ func _report() -> void:
 	text(stats, Rect2(780, 344, 1000, 210), 28)
 	text("报告包含昵称、版本、楼层、阵容、卡组装备、出牌、伤害和胜负。\n导出的报告已加密，修改后将无法通过校验；旧存档仅用于测试分析，不计入榜单。\n导出后可以自己上传到测试网站，游戏不会自动上传。成绩是否公开，由你选择。", Rect2(780, 585, 1000, 150), 23, MUTED).autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	button("导出存档与战斗数据  →", Rect2(780, 790, 600, 68), _export, true)
-	button("打开测试网站  ↗", Rect2(1410, 790, 385, 68), func(): OS.shell_open("https://inkspire-community.inkspire-community.workers.dev"))
+	button("打开测试网站  ↗", Rect2(1410, 790, 385, 68), func(): OS.shell_open("https://inkspire-game.freemyip.com"))
 
 func _export() -> void:
 	TowerRun.save_game()

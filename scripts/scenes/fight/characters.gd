@@ -25,6 +25,7 @@ var _error_label: Label
 var _tutorial_dialog: BattleTutorialDialog
 var _spotlight
 var _drafts: Dictionary = {}
+var _system_guide: Control
 
 func _ready() -> void:
 	if selected_hero != "":
@@ -46,6 +47,16 @@ func _ready() -> void:
 	_relayout()
 	if _in_tutorial():
 		call_deferred("_show_character_tutorial")
+	elif TowerRun.active and not as_overlay and not read_only and not TowerRun.data.get("character_guide", {}).get("completed", false):
+		call_deferred("_show_system_guide")
+
+func _show_system_guide(replay: bool = false) -> void:
+	if is_instance_valid(_system_guide): return
+	_system_guide = preload("res://scripts/ui/character_system_guide.gd").new()
+	_system_guide.replay = replay
+	_system_guide.page_requested.connect(_show_page)
+	_system_guide.completed.connect(func(): _system_guide = null)
+	_ui.add_child(_system_guide)
 
 func _in_tutorial() -> bool:
 	return not as_overlay and FightSystem.pending_tutorial_preparation
@@ -128,6 +139,10 @@ func _select_hero(hero_id: String) -> void:
 func _build_base() -> void:
 	var arena := String(PRESENTATION.for_encounter(FightSystem.encounter_serial, FightSystem.return_location, FightSystem.active_story_encounter).arena) if FightSystem.battle_active else PRESENTATION.preview_arena(FightSystem.return_location, FightSystem.pending_story_encounter)
 	M.shell(_ui, "角色系统", "查看角色成长、调整携带技能，或查阅战斗指南", PRESENTATION.arena_path(arena)).name = "CharacterBackground"
+	if TowerRun.active and not read_only:
+		var guide := M.button("功能教程", Rect2(596, 58, 170, 48), func(): _show_system_guide(true))
+		guide.name = "CharacterGuideReplay"
+		_ui.add_child(guide)
 	var pages := {"loadout":"角色与卡组", "equipment":"专武 / 遗物", "attributes":"属性克制", "bestiary":"怪物图鉴", "items":"战斗道具", "effects":"机制说明"}
 	var i := 0
 	for key in pages:
@@ -304,14 +319,29 @@ func _draw_skills(skills: Array, points: int, limit: int) -> void:
 	scroll.size = Vector2(864, 333)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	_content.add_child(scroll)
-	var grid := GridContainer.new()
-	grid.columns = 2
-	grid.add_theme_constant_override("h_separation", 14)
-	grid.add_theme_constant_override("v_separation", 14)
-	scroll.add_child(grid)
+	var groups := VBoxContainer.new()
+	groups.add_theme_constant_override("separation", 14)
+	scroll.add_child(groups)
+	var grid: GridContainer
+	var group := ""
+	var split_forms := _selected == "zhoumingyuan" and FightSystem.current_attribute(_selected) == "math"
 	for skill in skills:
 		var id := String(skill)
 		if _in_tutorial() and id == "red_pen": continue
+		var next_group := ("数学技能" if id.begins_with("M") else "通用无极技能") if split_forms else "全部技能"
+		if next_group != group:
+			group = next_group
+			if split_forms:
+				var heading := Label.new()
+				heading.text = group
+				heading.add_theme_font_size_override("font_size", 23)
+				heading.add_theme_color_override("font_color", T.GOLD)
+				groups.add_child(heading)
+			grid = GridContainer.new()
+			grid.columns = 2
+			grid.add_theme_constant_override("h_separation", 14)
+			grid.add_theme_constant_override("v_separation", 14)
+			groups.add_child(grid)
 		var def := FightData.skill(id)
 		var count := loadout.count(id)
 		var unlocked := FightSystem.skill_available(_selected, id)
@@ -393,6 +423,10 @@ func _add_button_icon(button: Button, icon_name: String) -> void:
 	_place(icon, Rect2(Vector2(4, 2), button.size - Vector2(8, 4)))
 
 func _input(event: InputEvent) -> void:
+	if is_instance_valid(_system_guide):
+		for action in ["pause", "ui_cancel", "ui_focus_next", "ui_focus_prev", "ui_up", "ui_down", "ui_left", "ui_right"]:
+			if event.is_action_pressed(action): get_viewport().set_input_as_handled()
+		return
 	if _content.find_child("EquipmentMotion", true, false) != null:
 		if event.is_action_pressed("pause") or event.is_action_pressed("ui_cancel"): get_viewport().set_input_as_handled()
 		return

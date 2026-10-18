@@ -91,7 +91,7 @@ static func refresh(s: Node, index: int) -> bool:
 			if e.statuses.has("offstage"):
 				e.intent = r.action("无实体", "all", 0, "report_absent", "无法被直接攻击；执行此意图后立即复生，可用敌方净化提前击败。")
 				return true
-			moves = [r.action("排名宣读", "single", r.scaled(e, 6, 0.3), "rankings", "攻击并向弃牌堆放入2张排名；留在手中到回合结束会施加颤栗。"), r.action("灰烬回响", "bounce", r.scaled(e, 5, 0.35), "ash_bounce", "弹射%d次，复生次数越多段数越多。" % (3 + int(e.revivals)), 3 + int(e.revivals))]
+			moves = [r.action("排名宣读", "single", r.scaled(e, 6, 0.3), "rankings", "攻击并向弃牌堆放入2张排名：留在手中到回合结束会施加颤栗。"), r.action("灰烬回响", "bounce", r.scaled(e, 5, 0.35), "ash_bounce", "弹射%d次，复生次数越多段数越多。" % (3 + int(e.revivals)), 3 + int(e.revivals))]
 		"quiet_hacker":
 			moves = [r.action("夺旗", "single", r.scaled(e, 11, 0.55), "steal_card", "攻击并暂时夺走目标的一张随机技能牌；黑客被击败后还回弃牌堆。"), r.action("黑客侵入", "single", r.scaled(e, 5, 0.25), "trojan", "攻击并使抽牌堆随机一张牌感染木马；在手牌时必须优先打出，效果无效。")]
 		"magician_master":

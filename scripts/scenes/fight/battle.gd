@@ -960,16 +960,19 @@ func _draw_allies() -> void:
 			var math_hitbox := Control.new()
 			math_hitbox.name = "MathPortraitInspect"
 			math_hitbox.mouse_filter = Control.MOUSE_FILTER_STOP
-			math_hitbox.tooltip_text = "右键查看演算区与战斗计数"
+			math_hitbox.tooltip_text = "点击头像查看演算区与战斗计数（也支持右键）；选取队友目标时优先施放技能"
 			_ui.add_child(math_hitbox)
 			_place(math_hitbox, portrait_rect)
 			math_hitbox.gui_input.connect(func(event: InputEvent) -> void:
 				if event is InputEventMouseButton and event.pressed:
-					if event.button_index == MOUSE_BUTTON_RIGHT or (event.button_index == MOUSE_BUTTON_LEFT and _mobile_inspect): _toggle_calculation()
-					elif event.button_index == MOUSE_BUTTON_LEFT: _select_ally(i)
+					if event.button_index == MOUSE_BUTTON_LEFT and FightSystem.pending_target_type() == "ally" and not _mobile_inspect: _select_ally(i)
+					elif event.button_index in [MOUSE_BUTTON_LEFT, MOUSE_BUTTON_RIGHT]: _toggle_calculation()
 					math_hitbox.accept_event()
 			)
 			_dynamic.append(math_hitbox)
+			var inspect_hint := FC_VISUALS.panel(math_hitbox, Rect2(0, portrait_rect.size.y - 24, portrait_rect.size.x, 24), Color("213d46"), Color("d6b97c"), 3)
+			inspect_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			FC_VISUALS.text(inspect_hint, "点击 · 演算区", Rect2(0, 0, portrait_rect.size.x, 24), 14, Color("f0dfb6"), true)
 
 func _draw_phoenix_ally(ally: Dictionary, index: int) -> void:
 	var rect := Rect2(592, ALLY_Y, 1240, 196)

@@ -150,9 +150,13 @@ static func skills_for(hero_id: String, attribute: String = "") -> Array:
 		return FC.CARDS.keys().filter(func(id: String) -> bool: return id.begins_with("LA"))
 	var prefix := String({"zhoumingyuan":"N", "alyina":"A", "wangjiaqi":"W", "chenmo":"C", "xumingming":"X", "suwanqing":"D", "liudanya":"Y"}.get(hero_id, "?"))
 	var result: Array = []
+	# Show the active form first; the neutral cards remain available below it.
+	if hero_id == "zhoumingyuan" and attribute == ATTR_MATH:
+		for id in FC.CARDS:
+			if String(FC.CARDS[id].code).begins_with("M"): result.append(id)
 	for id in FC.CARDS:
 		var code := String(FC.CARDS[id].code)
-		if code.begins_with(prefix) or (hero_id == "zhoumingyuan" and attribute == ATTR_MATH and code.begins_with("M")):
+		if code.begins_with(prefix):
 			result.append(id)
 	if hero_id == "zhoumingyuan": result.append("red_pen")
 	if hero_id == "alyina": result.append("hang_on")
