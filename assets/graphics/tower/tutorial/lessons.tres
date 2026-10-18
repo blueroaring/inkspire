@@ -1,0 +1,76 @@
+[gd_resource type="SpriteFrames" load_steps=26 format=3]
+[ext_resource type="Texture2D" path="res://assets/graphics/tower/tutorial/lessons.webp" id="1"]
+[sub_resource type="AtlasTexture" id="f0"]
+atlas = ExtResource("1")
+region = Rect2(0, 0, 768, 480)
+[sub_resource type="AtlasTexture" id="f1"]
+atlas = ExtResource("1")
+region = Rect2(768, 0, 768, 480)
+[sub_resource type="AtlasTexture" id="f2"]
+atlas = ExtResource("1")
+region = Rect2(1536, 0, 768, 480)
+[sub_resource type="AtlasTexture" id="f3"]
+atlas = ExtResource("1")
+region = Rect2(2304, 0, 768, 480)
+[sub_resource type="AtlasTexture" id="f4"]
+atlas = ExtResource("1")
+region = Rect2(3072, 0, 768, 480)
+[sub_resource type="AtlasTexture" id="f5"]
+atlas = ExtResource("1")
+region = Rect2(3840, 0, 768, 480)
+[sub_resource type="AtlasTexture" id="f6"]
+atlas = ExtResource("1")
+region = Rect2(0, 480, 768, 480)
+[sub_resource type="AtlasTexture" id="f7"]
+atlas = ExtResource("1")
+region = Rect2(768, 480, 768, 480)
+[sub_resource type="AtlasTexture" id="f8"]
+atlas = ExtResource("1")
+region = Rect2(1536, 480, 768, 480)
+[sub_resource type="AtlasTexture" id="f9"]
+atlas = ExtResource("1")
+region = Rect2(2304, 480, 768, 480)
+[sub_resource type="AtlasTexture" id="f10"]
+atlas = ExtResource("1")
+region = Rect2(3072, 480, 768, 480)
+[sub_resource type="AtlasTexture" id="f11"]
+atlas = ExtResource("1")
+region = Rect2(3840, 480, 768, 480)
+[sub_resource type="AtlasTexture" id="f12"]
+atlas = ExtResource("1")
+region = Rect2(0, 960, 768, 480)
+[sub_resource type="AtlasTexture" id="f13"]
+atlas = ExtResource("1")
+region = Rect2(768, 960, 768, 480)
+[sub_resource type="AtlasTexture" id="f14"]
+atlas = ExtResource("1")
+region = Rect2(1536, 960, 768, 480)
+[sub_resource type="AtlasTexture" id="f15"]
+atlas = ExtResource("1")
+region = Rect2(2304, 960, 768, 480)
+[sub_resource type="AtlasTexture" id="f16"]
+atlas = ExtResource("1")
+region = Rect2(3072, 960, 768, 480)
+[sub_resource type="AtlasTexture" id="f17"]
+atlas = ExtResource("1")
+region = Rect2(3840, 960, 768, 480)
+[sub_resource type="AtlasTexture" id="f18"]
+atlas = ExtResource("1")
+region = Rect2(0, 1440, 768, 480)
+[sub_resource type="AtlasTexture" id="f19"]
+atlas = ExtResource("1")
+region = Rect2(768, 1440, 768, 480)
+[sub_resource type="AtlasTexture" id="f20"]
+atlas = ExtResource("1")
+region = Rect2(1536, 1440, 768, 480)
+[sub_resource type="AtlasTexture" id="f21"]
+atlas = ExtResource("1")
+region = Rect2(2304, 1440, 768, 480)
+[sub_resource type="AtlasTexture" id="f22"]
+atlas = ExtResource("1")
+region = Rect2(3072, 1440, 768, 480)
+[sub_resource type="AtlasTexture" id="f23"]
+atlas = ExtResource("1")
+region = Rect2(3840, 1440, 768, 480)
+[resource]
+animations = [{"name":&"default","loop":true,"speed":6.25,"frames":[{"duration":1.0,"texture":SubResource("f0")},{"duration":1.0,"texture":SubResource("f1")},{"duration":1.0,"texture":SubResource("f2")},{"duration":1.0,"texture":SubResource("f3")},{"duration":1.0,"texture":SubResource("f4")},{"duration":1.0,"texture":SubResource("f5")},{"duration":1.0,"texture":SubResource("f6")},{"duration":1.0,"texture":SubResource("f7")},{"duration":1.0,"texture":SubResource("f8")},{"duration":1.0,"texture":SubResource("f9")},{"duration":1.0,"texture":SubResource("f10")},{"duration":1.0,"texture":SubResource("f11")},{"duration":1.0,"texture":SubResource("f12")},{"duration":1.0,"texture":SubResource("f13")},{"duration":1.0,"texture":SubResource("f14")},{"duration":1.0,"texture":SubResource("f15")},{"duration":1.0,"texture":SubResource("f16")},{"duration":1.0,"texture":SubResource("f17")},{"duration":1.0,"texture":SubResource("f18")},{"duration":1.0,"texture":SubResource("f19")},{"duration":1.0,"texture":SubResource("f20")},{"duration":1.0,"texture":SubResource("f21")},{"duration":1.0,"texture":SubResource("f22")},{"duration":1.0,"texture":SubResource("f23")}]}]

@@ -1,0 +1,44 @@
+美术与音效
+
+角色、怪物、卡牌、背景与界面
+项目美术包含 AI 图像工具生成或编辑的素材，以及项目编写的界面绘制、特效和图像合成。制作记录包括 OpenAI 图像生成工具、APINebula 图像服务及用户提供的生成素材。
+
+早期像素测试头像
+参考 Kenney 的 Roguelike Characters pack (2.0) 以及项目已有角色形象，经 APINebula 生成并处理。该参考素材采用 CC0 1.0；生成后的测试头像不是 Kenney 原作。
+Kenney · https://kenney.nl/assets/roguelike-characters
+原始素材署名与许可全文附于本页末尾。
+
+项目音效
+当前战斗与怪物音效主要由项目脚本合成，未使用第三方采样。
+
+随包保留的水声音源
+Waterflow Sound · TyberiusGames · CC0 1.0
+https://opengameart.org/content/waterflow-sound
+该音源用于主工程洗漱场景，尖塔玩法不播放。
+
+来源记录
+美术生成、参考与处理记录保存在项目素材目录和 docs/THIRD_PARTY_ASSETS.md；生成工具的来源说明不构成对外素材许可。
+
+----- Kenney original notice -----
+	
+
+	Roguelike Characters pack (2.0)
+
+	Created/distributed by Kenney (www.kenney.nl)
+	Creation date: 20-05-2015
+
+			------------------------------
+
+	License: (Creative Commons Zero, CC0)
+	http://creativecommons.org/publicdomain/zero/1.0/
+
+	This content is free to use in personal, educational and commercial projects.
+	Support us by crediting Kenney or www.kenney.nl (this is not mandatory)
+
+			------------------------------
+
+	Donate:   http://support.kenney.nl
+	Patreon:  http://patreon.com/kenney/
+
+	Follow on Twitter for updates:
+	http://twitter.com/KenneyNL

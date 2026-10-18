@@ -1,0 +1,400 @@
+高中异闻：尖塔 — THIRD-PARTY NOTICES
+
+本文件列出本发布包使用或附带的第三方内容。游戏本体的声明见 LICENSE.txt。
+Godot 及组件的完整声明见 licenses/GODOT-LICENSE.txt 和 licenses/GODOT-THIRD-PARTY.txt；游戏内显示当前运行引擎的原文。
+
+音乐与作者
+
+以下曲目采用 CC0 1.0 Universal。保留作者署名以感谢和记录创作来源。
+许可：https://creativecommons.org/publicdomain/zero/1.0/
+完整原文见 CC0-1.0.txt。
+
+标题音乐 / Title Theme (2022 revised loop)
+Bobjt · CC0-1.0
+https://opengameart.org/content/title-theme-0
+文件：assets/audio/bgm/title_theme_loop.mp3
+处理：Renamed only; original MP3 and author-provided loop preserved.
+
+普通战斗 / Battle Theme A
+cynicmusic · CC0-1.0
+https://opengameart.org/content/battle-theme-a
+文件：assets/audio/bgm/battle/battle_theme_a.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+普通战斗 / Battle Theme B for RPG
+cynicmusic · CC0-1.0
+https://opengameart.org/content/battle-theme-b-for-rpg
+文件：assets/audio/bgm/battle/battle_theme_b.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+普通战斗 / JRPG Epic Rock Battle Theme #1 (loop)
+HydroGene · CC0-1.0
+https://opengameart.org/content/jrpg-epic-rock-battle-theme-1
+文件：assets/audio/bgm/battle/battle_epic_rock.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+普通战斗 / Determined Pursuit (epic orchestra loop)
+Emma_MA · CC0-1.0
+https://opengameart.org/content/determined-pursuit-epic-orchestra-loop
+文件：assets/audio/bgm/battle/battle_pursuit.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+精英与首领 / Dark Shrine Loop
+qubodup / yd · CC0-1.0
+https://opengameart.org/content/dark-shrine-loop
+文件：assets/audio/bgm/tower/book.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+精英与首领 / Marionettes (Piano)
+Bobjt · CC0-1.0
+https://opengameart.org/content/marionettes
+文件：assets/audio/bgm/tower/ranking.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+精英与首领 / Ring Master Black Build III
+Bobjt · CC0-1.0
+https://opengameart.org/content/ring-master
+文件：assets/audio/bgm/tower/magician.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+精英与首领 / Insistent
+yd · CC0-1.0
+https://opengameart.org/content/insistent-background-loop
+文件：assets/audio/bgm/tower/infirmary.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+精英与首领 / Pressure
+yd · CC0-1.0
+https://opengameart.org/content/pressure
+文件：assets/audio/bgm/tower/claustrophobia.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+精英与首领 / The Rush
+tebruno99 · CC0-1.0
+https://opengameart.org/content/the-rush
+文件：assets/audio/bgm/tower/perfect.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+精英与首领 / Epic Boss Battle
+Juhani Junkala / SubspaceAudio · CC0-1.0
+https://opengameart.org/content/boss-battle-music
+文件：assets/audio/bgm/tower/thunder.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+精英与首领 / Fighting Is Not an Option
+Cleyton Kauffman · CC0-1.0
+https://opengameart.org/content/rpg-battle-theme-ii
+文件：assets/audio/bgm/tower/math.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+精英与首领 / Vampire's Piano
+TAD · CC0-1.0
+https://opengameart.org/content/vampires-piano
+文件：assets/audio/bgm/tower/phantom.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+精英与首领 / Dark Intro
+Nikke · CC0-1.0
+https://opengameart.org/content/dark-intro
+文件：assets/audio/bgm/tower/panic.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+精英与首领 / Evil Approach
+nene · CC0-1.0
+https://opengameart.org/content/evil-approach
+文件：assets/audio/bgm/tower/injury.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+精英与首领 / Unchained Destiny (Loop)
+nene · CC0-1.0
+https://opengameart.org/content/unchained-destiny-rock
+文件：assets/audio/bgm/tower/training.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+精英与首领 / Fight for Better Future
+nene · CC0-1.0
+https://opengameart.org/content/fight-for-better-future-rockmetal
+文件：assets/audio/bgm/tower/mirror.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+终末回响 / The Final Battle
+skrjablin · CC0-1.0
+https://opengameart.org/content/the-final-battle
+文件：assets/audio/bgm/finale/descent.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+终末回响 / Boss Battle Theme (Variation)
+Cleyton Kauffman · CC0-1.0
+https://opengameart.org/content/boss-battle-theme
+文件：assets/audio/bgm/finale/resistance.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+终末回响 / Hope (Orchestral battle music)
+MintoDog · CC0-1.0
+https://opengameart.org/content/hopeorchestral-battle-music
+文件：assets/audio/bgm/finale/dawn.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+战斗结算 / Win Jingle
+Fupi · CC0-1.0
+https://opengameart.org/content/win-jingle
+文件：assets/audio/bgm/results/battle_victory.ogg
+处理：Constant gain to -20 LUFS or -1.5 dBTP ceiling, Vorbis q5; no musical edits
+
+战斗结算 / No Hope (Game Over Theme)
+Cleyton Kauffman · CC0-1.0
+https://opengameart.org/content/game-over-theme
+文件：assets/audio/bgm/results/battle_defeat.ogg
+处理：Constant gain to -20 LUFS or -1.5 dBTP ceiling, Vorbis q5; no musical edits
+
+
+美术与音效
+
+角色、怪物、卡牌、背景与界面
+项目美术包含 AI 图像工具生成或编辑的素材，以及项目编写的界面绘制、特效和图像合成。制作记录包括 OpenAI 图像生成工具、APINebula 图像服务及用户提供的生成素材。
+
+早期像素测试头像
+参考 Kenney 的 Roguelike Characters pack (2.0) 以及项目已有角色形象，经 APINebula 生成并处理。该参考素材采用 CC0 1.0；生成后的测试头像不是 Kenney 原作。
+Kenney · https://kenney.nl/assets/roguelike-characters
+原始素材署名与许可全文附于本页末尾。
+
+项目音效
+当前战斗与怪物音效主要由项目脚本合成，未使用第三方采样。
+
+随包保留的水声音源
+Waterflow Sound · TyberiusGames · CC0 1.0
+https://opengameart.org/content/waterflow-sound
+该音源用于主工程洗漱场景，尖塔玩法不播放。
+
+来源记录
+美术生成、参考与处理记录保存在项目素材目录和 docs/THIRD_PARTY_ASSETS.md；生成工具的来源说明不构成对外素材许可。
+
+----- Kenney original notice -----
+	
+
+	Roguelike Characters pack (2.0)
+
+	Created/distributed by Kenney (www.kenney.nl)
+	Creation date: 20-05-2015
+
+			------------------------------
+
+	License: (Creative Commons Zero, CC0)
+	http://creativecommons.org/publicdomain/zero/1.0/
+
+	This content is free to use in personal, educational and commercial projects.
+	Support us by crediting Kenney or www.kenney.nl (this is not mandatory)
+
+			------------------------------
+
+	Donate:   http://support.kenney.nl
+	Patreon:  http://patreon.com/kenney/
+
+	Follow on Twitter for updates:
+	http://twitter.com/KenneyNL
+
+
+Noto Sans SC / Noto Serif SC
+SIL Open Font License 1.1
+
+Noto Sans SC Regular / Bold
+© 2014-2021 Adobe (http://www.adobe.com/).
+https://github.com/notofonts/noto-cjk
+
+Noto Serif SC Variable
+(c) 2017-2024 Adobe (http://www.adobe.com/).
+https://github.com/google/fonts/tree/main/ofl/notoserifsc
+
+上述版权声明抄录自随包字体的 name 表；字体二进制未作修改。
+以下分别保留两套字体随附的完整许可文本。
+
+----- Noto Sans SC -----
+This Font Software is licensed under the SIL Open Font License,
+Version 1.1.
+
+This license is copied below, and is also available with a FAQ at:
+http://scripts.sil.org/OFL
+
+-----------------------------------------------------------
+SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
+-----------------------------------------------------------
+
+PREAMBLE
+The goals of the Open Font License (OFL) are to stimulate worldwide
+development of collaborative font projects, to support the font
+creation efforts of academic and linguistic communities, and to
+provide a free and open framework in which fonts may be shared and
+improved in partnership with others.
+
+The OFL allows the licensed fonts to be used, studied, modified and
+redistributed freely as long as they are not sold by themselves. The
+fonts, including any derivative works, can be bundled, embedded,
+redistributed and/or sold with any software provided that any reserved
+names are not used by derivative works. The fonts and derivatives,
+however, cannot be released under any other type of license. The
+requirement for fonts to remain under this license does not apply to
+any document created using the fonts or their derivatives.
+
+DEFINITIONS
+"Font Software" refers to the set of files released by the Copyright
+Holder(s) under this license and clearly marked as such. This may
+include source files, build scripts and documentation.
+
+"Reserved Font Name" refers to any names specified as such after the
+copyright statement(s).
+
+"Original Version" refers to the collection of Font Software
+components as distributed by the Copyright Holder(s).
+
+"Modified Version" refers to any derivative made by adding to,
+deleting, or substituting -- in part or in whole -- any of the
+components of the Original Version, by changing formats or by porting
+the Font Software to a new environment.
+
+"Author" refers to any designer, engineer, programmer, technical
+writer or other person who contributed to the Font Software.
+
+PERMISSION & CONDITIONS
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of the Font Software, to use, study, copy, merge, embed,
+modify, redistribute, and sell modified and unmodified copies of the
+Font Software, subject to the following conditions:
+
+1) Neither the Font Software nor any of its individual components, in
+Original or Modified Versions, may be sold by itself.
+
+2) Original or Modified Versions of the Font Software may be bundled,
+redistributed and/or sold with any software, provided that each copy
+contains the above copyright notice and this license. These can be
+included either as stand-alone text files, human-readable headers or
+in the appropriate machine-readable metadata fields within text or
+binary files as long as those fields can be easily viewed by the user.
+
+3) No Modified Version of the Font Software may use the Reserved Font
+Name(s) unless explicit written permission is granted by the
+corresponding Copyright Holder. This restriction only applies to the
+primary font name as presented to the users.
+
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font
+Software shall not be used to promote, endorse or advertise any
+Modified Version, except to acknowledge the contribution(s) of the
+Copyright Holder(s) and the Author(s) or with their explicit written
+permission.
+
+5) The Font Software, modified or unmodified, in part or in whole,
+must be distributed entirely under this license, and must not be
+distributed under any other license. The requirement for fonts to
+remain under this license does not apply to any document created using
+the Font Software.
+
+TERMINATION
+This license becomes null and void if any of the above conditions are
+not met.
+
+DISCLAIMER
+THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
+OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE
+COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL
+DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
+OTHER DEALINGS IN THE FONT SOFTWARE.
+
+
+----- Noto Serif SC -----
+Copyright 2012 Google Inc. All Rights Reserved.
+
+This Font Software is licensed under the SIL Open Font License,
+Version 1.1.
+
+This license is copied below, and is also available with a FAQ at:
+http://scripts.sil.org/OFL
+
+-----------------------------------------------------------
+SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
+-----------------------------------------------------------
+
+PREAMBLE
+The goals of the Open Font License (OFL) are to stimulate worldwide
+development of collaborative font projects, to support the font
+creation efforts of academic and linguistic communities, and to
+provide a free and open framework in which fonts may be shared and
+improved in partnership with others.
+
+The OFL allows the licensed fonts to be used, studied, modified and
+redistributed freely as long as they are not sold by themselves. The
+fonts, including any derivative works, can be bundled, embedded,
+redistributed and/or sold with any software provided that any reserved
+names are not used by derivative works. The fonts and derivatives,
+however, cannot be released under any other type of license. The
+requirement for fonts to remain under this license does not apply to
+any document created using the fonts or their derivatives.
+
+DEFINITIONS
+"Font Software" refers to the set of files released by the Copyright
+Holder(s) under this license and clearly marked as such. This may
+include source files, build scripts and documentation.
+
+"Reserved Font Name" refers to any names specified as such after the
+copyright statement(s).
+
+"Original Version" refers to the collection of Font Software
+components as distributed by the Copyright Holder(s).
+
+"Modified Version" refers to any derivative made by adding to,
+deleting, or substituting -- in part or in whole -- any of the
+components of the Original Version, by changing formats or by porting
+the Font Software to a new environment.
+
+"Author" refers to any designer, engineer, programmer, technical
+writer or other person who contributed to the Font Software.
+
+PERMISSION & CONDITIONS
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of the Font Software, to use, study, copy, merge, embed,
+modify, redistribute, and sell modified and unmodified copies of the
+Font Software, subject to the following conditions:
+
+1) Neither the Font Software nor any of its individual components, in
+Original or Modified Versions, may be sold by itself.
+
+2) Original or Modified Versions of the Font Software may be bundled,
+redistributed and/or sold with any software, provided that each copy
+contains the above copyright notice and this license. These can be
+included either as stand-alone text files, human-readable headers or
+in the appropriate machine-readable metadata fields within text or
+binary files as long as those fields can be easily viewed by the user.
+
+3) No Modified Version of the Font Software may use the Reserved Font
+Name(s) unless explicit written permission is granted by the
+corresponding Copyright Holder. This restriction only applies to the
+primary font name as presented to the users.
+
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font
+Software shall not be used to promote, endorse or advertise any
+Modified Version, except to acknowledge the contribution(s) of the
+Copyright Holder(s) and the Author(s) or with their explicit written
+permission.
+
+5) The Font Software, modified or unmodified, in part or in whole,
+must be distributed entirely under this license, and must not be
+distributed under any other license. The requirement for fonts to
+remain under this license does not apply to any document created using
+the Font Software.
+
+TERMINATION
+This license becomes null and void if any of the above conditions are
+not met.
+
+DISCLAIMER
+THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
+OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE
+COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL
+DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
+OTHER DEALINGS IN THE FONT SOFTWARE.

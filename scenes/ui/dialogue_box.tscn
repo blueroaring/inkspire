@@ -1,0 +1,120 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/ui/dialogue_box.gd" id="1_dlg"]
+
+; 说明：这里只描述**节点结构**，所有样式（配色/描边/字号/圆角）由
+; scripts/ui/dialogue_style.gd 在运行时套上去 —— 换风格只改那一个文件。
+; 版式是 LingChat 风格的 galgame 全宽框：底部渐变遮罩 + 贴底对话框 +
+; 左侧立绘位 + 名牌/情绪标签 + 逐字上浮的正文 + 右下"继续"指示三角。
+;
+; ⚠️ 对话框本体全部塞在 BoxRoot 下：hide_box() 只隐藏 BoxRoot，
+;    而不是隐藏整个 CanvasLayer —— 否则"对话回顾"面板会被一起藏掉，
+;    表现是"面板状态明明是开的，屏幕上却什么都没有"（这个坑真踩过）。
+
+[node name="DialogueBox" type="CanvasLayer"]
+layer = 40
+script = ExtResource("1_dlg")
+
+[node name="BoxRoot" type="Node2D" parent="."]
+
+[node name="Backdrop" type="ColorRect" parent="BoxRoot"]
+color = Color(0, 0, 0, 0.16)
+
+[node name="Shade" type="TextureRect" parent="BoxRoot"]
+expand_mode = 1
+stretch_mode = 0
+mouse_filter = 2
+
+[node name="PhotoOverlay" type="TextureRect" parent="BoxRoot"]
+visible = false
+z_index = 2
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+
+[node name="Bust" type="TextureRect" parent="BoxRoot"]
+visible = false
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+
+[node name="Window" type="PanelContainer" parent="BoxRoot"]
+z_index = 3
+
+[node name="HBox" type="HBoxContainer" parent="BoxRoot/Window"]
+layout_mode = 2
+theme_override_constants/separation = 26
+
+[node name="PortraitFrame" type="PanelContainer" parent="BoxRoot/Window/HBox"]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="Portrait" type="TextureRect" parent="BoxRoot/Window/HBox/PortraitFrame"]
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Right" type="VBoxContainer" parent="BoxRoot/Window/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="Header" type="HBoxContainer" parent="BoxRoot/Window/HBox/Right"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="NamePlate" type="PanelContainer" parent="BoxRoot/Window/HBox/Right/Header"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="Speaker" type="Label" parent="BoxRoot/Window/HBox/Right/Header/NamePlate"]
+layout_mode = 2
+text = "说话人"
+
+[node name="EmotionTag" type="Label" parent="BoxRoot/Window/HBox/Right/Header"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="Spacer" type="Control" parent="BoxRoot/Window/HBox/Right/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ModeTag" type="Label" parent="BoxRoot/Window/HBox/Right/Header"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="Body" type="MarginContainer" parent="BoxRoot/Window/HBox/Right"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Text" type="RichTextLabel" parent="BoxRoot/Window/HBox/Right/Body"]
+layout_mode = 2
+size_flags_vertical = 3
+bbcode_enabled = true
+fit_content = false
+scroll_active = false
+
+[node name="Footer" type="HBoxContainer" parent="BoxRoot/Window/HBox/Right"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Hint" type="Label" parent="BoxRoot/Window/HBox/Right/Footer"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="Spacer" type="Control" parent="BoxRoot/Window/HBox/Right/Footer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Indicator" type="Label" parent="BoxRoot/Window/HBox/Right/Footer"]
+layout_mode = 2
+size_flags_vertical = 4
+text = "▼"
+
+[node name="Choices" type="VBoxContainer" parent="BoxRoot"]
+theme_override_constants/separation = 14
+
+[node name="ChoiceProto" type="Button" parent="BoxRoot/Choices"]
+visible = false
+layout_mode = 2

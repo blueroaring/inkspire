@@ -1,0 +1,299 @@
+[
+  {
+    "key": "zhou_wuji",
+    "source": "assets/graphics/battle/costumes/20261015/zhou_wuji/portrait.webp",
+    "blink": "res://assets/graphics/battle/living_portraits/zhou_wuji_blink.webp",
+    "size": [
+      270,
+      320
+    ],
+    "eyes": [
+      [
+        81,
+        164,
+        18,
+        12,
+        -14
+      ],
+      [
+        140,
+        149,
+        22,
+        13,
+        -14
+      ]
+    ],
+    "alignment": {
+      "scale": 1.0,
+      "dx": 0,
+      "dy": 0,
+      "mse": 199.32
+    },
+    "generator": "APINebula gpt-image-2.5",
+    "prompt": "prompts/zhou_wuji_blink.txt"
+  },
+  {
+    "key": "zhou_math",
+    "source": "assets/graphics/battle/costumes/20261015/zhou_math/portrait.webp",
+    "blink": "res://assets/graphics/battle/living_portraits/zhou_math_blink.webp",
+    "size": [
+      265,
+      315
+    ],
+    "eyes": [
+      [
+        87,
+        162,
+        18,
+        12,
+        -14
+      ],
+      [
+        146,
+        146,
+        22,
+        13,
+        -14
+      ]
+    ],
+    "alignment": {
+      "scale": 0.97,
+      "dx": 1,
+      "dy": 8,
+      "mse": 847.72
+    },
+    "generator": "APINebula gpt-image-2.5",
+    "prompt": "prompts/zhou_math_blink.txt"
+  },
+  {
+    "key": "chen",
+    "source": "assets/graphics/battle/costumes/20261015/chen/portrait.webp",
+    "blink": "res://assets/graphics/battle/living_portraits/chen_blink.webp",
+    "size": [
+      280,
+      330
+    ],
+    "eyes": [
+      [
+        63,
+        149,
+        11,
+        9,
+        -5
+      ],
+      [
+        104,
+        147,
+        23,
+        12,
+        -5
+      ]
+    ],
+    "alignment": {
+      "scale": 1.03,
+      "dx": 0,
+      "dy": 0,
+      "mse": 332.81
+    },
+    "generator": "APINebula gpt-image-2.5",
+    "prompt": "prompts/chen_blink.txt"
+  },
+  {
+    "key": "xu",
+    "source": "assets/graphics/battle/costumes/20261015/xu/portrait.webp",
+    "blink": "res://assets/graphics/battle/living_portraits/xu_blink.webp",
+    "size": [
+      320,
+      365
+    ],
+    "eyes": [
+      [
+        101,
+        227,
+        20,
+        13,
+        -18
+      ],
+      [
+        168,
+        207,
+        24,
+        14,
+        -18
+      ]
+    ],
+    "alignment": {
+      "scale": 1.015,
+      "dx": 0,
+      "dy": -3,
+      "mse": 334.82
+    },
+    "generator": "APINebula gpt-image-2.5",
+    "prompt": "prompts/xu_blink.txt"
+  },
+  {
+    "key": "su",
+    "source": "assets/graphics/battle/costumes/20261015/su/portrait.webp",
+    "blink": "res://assets/graphics/battle/living_portraits/su_blink.webp",
+    "size": [
+      300,
+      355
+    ],
+    "eyes": [
+      [
+        112,
+        190,
+        17,
+        12,
+        -22
+      ],
+      [
+        167,
+        163,
+        22,
+        13,
+        -22
+      ]
+    ],
+    "alignment": {
+      "scale": 1.0,
+      "dx": -3,
+      "dy": 0,
+      "mse": 371.27
+    },
+    "generator": "APINebula gpt-image-2.5",
+    "prompt": "prompts/su_blink.txt"
+  },
+  {
+    "key": "liu",
+    "source": "assets/graphics/battle/costumes/20261015/liu/portrait.webp",
+    "blink": "res://assets/graphics/battle/living_portraits/liu_blink.webp",
+    "size": [
+      290,
+      350
+    ],
+    "eyes": [
+      [
+        150,
+        163,
+        23,
+        14,
+        15
+      ],
+      [
+        204,
+        179,
+        17,
+        12,
+        15
+      ]
+    ],
+    "alignment": {
+      "scale": 1.0,
+      "dx": 0,
+      "dy": -1,
+      "mse": 196.6
+    },
+    "generator": "APINebula gpt-image-2.5",
+    "prompt": "prompts/liu_blink.txt"
+  },
+  {
+    "key": "alyina",
+    "source": "assets/graphics/portraits/generated/celia/processed/anime.webp",
+    "blink": "res://assets/graphics/battle/living_portraits/alyina_blink.webp",
+    "size": [
+      512,
+      512
+    ],
+    "eyes": [
+      [
+        184,
+        234,
+        28,
+        28,
+        -14
+      ],
+      [
+        283,
+        205,
+        31,
+        29,
+        -14
+      ]
+    ],
+    "alignment": {
+      "scale": 1.0,
+      "dx": 0,
+      "dy": 0,
+      "mse": 142.52
+    },
+    "generator": "APINebula gpt-image-2.5",
+    "prompt": "prompts/alyina_blink.txt"
+  },
+  {
+    "key": "wang",
+    "source": "assets/graphics/battle/fc_art/wang_portrait/clean.webp",
+    "blink": "res://assets/graphics/battle/living_portraits/wang_blink.webp",
+    "size": [
+      512,
+      512
+    ],
+    "eyes": [
+      [
+        189,
+        205,
+        20,
+        13,
+        -20
+      ],
+      [
+        256,
+        176,
+        24,
+        15,
+        -20
+      ]
+    ],
+    "alignment": {
+      "scale": 1.0,
+      "dx": 0,
+      "dy": 0,
+      "mse": 151.68
+    },
+    "generator": "APINebula gpt-image-2.5",
+    "prompt": "prompts/wang_blink.txt"
+  },
+  {
+    "key": "anya",
+    "source": "assets/graphics/battle/anya/portrait_bound.webp",
+    "blink": "res://assets/graphics/battle/living_portraits/anya_blink.webp",
+    "size": [
+      462,
+      600
+    ],
+    "eyes": [
+      [
+        199,
+        134,
+        16,
+        10,
+        13
+      ],
+      [
+        250,
+        151,
+        19,
+        11,
+        13
+      ]
+    ],
+    "alignment": {
+      "scale": 1.0,
+      "dx": 1,
+      "dy": 0,
+      "mse": 165.03
+    },
+    "generator": "APINebula gpt-image-2.5",
+    "prompt": "prompts/anya_blink.txt"
+  }
+]

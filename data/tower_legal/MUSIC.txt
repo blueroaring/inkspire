@@ -1,0 +1,143 @@
+音乐与作者
+
+以下曲目采用 CC0 1.0 Universal。保留作者署名以感谢和记录创作来源。
+许可：https://creativecommons.org/publicdomain/zero/1.0/
+完整原文见 CC0-1.0.txt。
+
+标题音乐 / Title Theme (2022 revised loop)
+Bobjt · CC0-1.0
+https://opengameart.org/content/title-theme-0
+文件：assets/audio/bgm/title_theme_loop.mp3
+处理：Renamed only; original MP3 and author-provided loop preserved.
+
+普通战斗 / Battle Theme A
+cynicmusic · CC0-1.0
+https://opengameart.org/content/battle-theme-a
+文件：assets/audio/bgm/battle/battle_theme_a.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+普通战斗 / Battle Theme B for RPG
+cynicmusic · CC0-1.0
+https://opengameart.org/content/battle-theme-b-for-rpg
+文件：assets/audio/bgm/battle/battle_theme_b.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+普通战斗 / JRPG Epic Rock Battle Theme #1 (loop)
+HydroGene · CC0-1.0
+https://opengameart.org/content/jrpg-epic-rock-battle-theme-1
+文件：assets/audio/bgm/battle/battle_epic_rock.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+普通战斗 / Determined Pursuit (epic orchestra loop)
+Emma_MA · CC0-1.0
+https://opengameart.org/content/determined-pursuit-epic-orchestra-loop
+文件：assets/audio/bgm/battle/battle_pursuit.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+精英与首领 / Dark Shrine Loop
+qubodup / yd · CC0-1.0
+https://opengameart.org/content/dark-shrine-loop
+文件：assets/audio/bgm/tower/book.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+精英与首领 / Marionettes (Piano)
+Bobjt · CC0-1.0
+https://opengameart.org/content/marionettes
+文件：assets/audio/bgm/tower/ranking.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+精英与首领 / Ring Master Black Build III
+Bobjt · CC0-1.0
+https://opengameart.org/content/ring-master
+文件：assets/audio/bgm/tower/magician.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+精英与首领 / Insistent
+yd · CC0-1.0
+https://opengameart.org/content/insistent-background-loop
+文件：assets/audio/bgm/tower/infirmary.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+精英与首领 / Pressure
+yd · CC0-1.0
+https://opengameart.org/content/pressure
+文件：assets/audio/bgm/tower/claustrophobia.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+精英与首领 / The Rush
+tebruno99 · CC0-1.0
+https://opengameart.org/content/the-rush
+文件：assets/audio/bgm/tower/perfect.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+精英与首领 / Epic Boss Battle
+Juhani Junkala / SubspaceAudio · CC0-1.0
+https://opengameart.org/content/boss-battle-music
+文件：assets/audio/bgm/tower/thunder.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+精英与首领 / Fighting Is Not an Option
+Cleyton Kauffman · CC0-1.0
+https://opengameart.org/content/rpg-battle-theme-ii
+文件：assets/audio/bgm/tower/math.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+精英与首领 / Vampire's Piano
+TAD · CC0-1.0
+https://opengameart.org/content/vampires-piano
+文件：assets/audio/bgm/tower/phantom.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+精英与首领 / Dark Intro
+Nikke · CC0-1.0
+https://opengameart.org/content/dark-intro
+文件：assets/audio/bgm/tower/panic.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+精英与首领 / Evil Approach
+nene · CC0-1.0
+https://opengameart.org/content/evil-approach
+文件：assets/audio/bgm/tower/injury.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+精英与首领 / Unchained Destiny (Loop)
+nene · CC0-1.0
+https://opengameart.org/content/unchained-destiny-rock
+文件：assets/audio/bgm/tower/training.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+精英与首领 / Fight for Better Future
+nene · CC0-1.0
+https://opengameart.org/content/fight-for-better-future-rockmetal
+文件：assets/audio/bgm/tower/mirror.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+终末回响 / The Final Battle
+skrjablin · CC0-1.0
+https://opengameart.org/content/the-final-battle
+文件：assets/audio/bgm/finale/descent.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+终末回响 / Boss Battle Theme (Variation)
+Cleyton Kauffman · CC0-1.0
+https://opengameart.org/content/boss-battle-theme
+文件：assets/audio/bgm/finale/resistance.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+终末回响 / Hope (Orchestral battle music)
+MintoDog · CC0-1.0
+https://opengameart.org/content/hopeorchestral-battle-music
+文件：assets/audio/bgm/finale/dawn.ogg
+处理：Constant gain, 44.1 kHz Vorbis q5; no edits to musical order or loop points.
+
+战斗结算 / Win Jingle
+Fupi · CC0-1.0
+https://opengameart.org/content/win-jingle
+文件：assets/audio/bgm/results/battle_victory.ogg
+处理：Constant gain to -20 LUFS or -1.5 dBTP ceiling, Vorbis q5; no musical edits
+
+战斗结算 / No Hope (Game Over Theme)
+Cleyton Kauffman · CC0-1.0
+https://opengameart.org/content/game-over-theme
+文件：assets/audio/bgm/results/battle_defeat.ogg
+处理：Constant gain to -20 LUFS or -1.5 dBTP ceiling, Vorbis q5; no musical edits

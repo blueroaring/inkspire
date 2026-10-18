@@ -1,0 +1,12 @@
+* text=auto
+*.gd text eol=lf
+*.tscn text eol=lf
+*.tres text eol=lf
+*.import text eol=lf
+*.webp binary
+*.ogg binary
+*.wav binary
+*.mp3 binary
+*.ogv binary
+*.otf binary
+*.ttf binary

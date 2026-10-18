@@ -1,0 +1,624 @@
+{
+  "source_directory": "newrecgen",
+  "tracks": {
+    "enemy_zeus_dean_sentence": {
+      "source": "newrecgen/愚行，无处遁形.mp3",
+      "source_sha256": "8ae627dcd2767edc58feabaf643413b16736a84d196d2a6c940fe40e5517ab95",
+      "text": "愚行，无处遁形",
+      "source_seconds": 5.064,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/愚行，无处遁形.mp3",
+          "seconds": 5.064,
+          "sha256": "8ae627dcd2767edc58feabaf643413b16736a84d196d2a6c940fe40e5517ab95"
+        }
+      ]
+    },
+    "enemy_nightmare_fear": {
+      "source": "newrecgen/恐惧，不会消散.mp3",
+      "source_sha256": "29ae8df130e93b323bf0d737a0b8738ec9ee78accfb6eb4adeafba2d63626931",
+      "text": "恐惧，不会消散",
+      "source_seconds": 3.552,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/恐惧，不会消散.mp3",
+          "seconds": 3.552,
+          "sha256": "29ae8df130e93b323bf0d737a0b8738ec9ee78accfb6eb4adeafba2d63626931"
+        }
+      ]
+    },
+    "enemy_panic_throat_summon": {
+      "source": "newrecgen/他们，都在看着你.mp3",
+      "source_sha256": "08eaf3c9145b2fb7b80cf1132d303af9c645e442ac127ae91a47e43a0f1c18f3",
+      "text": "他们，都在看着你",
+      "source_seconds": 6.648,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/他们，都在看着你.mp3",
+          "seconds": 6.648,
+          "sha256": "08eaf3c9145b2fb7b80cf1132d303af9c645e442ac127ae91a47e43a0f1c18f3"
+        }
+      ]
+    },
+    "enemy_panic_throat_nightmare": {
+      "source": "newrecgen/坠入，无边噩梦.mp3",
+      "source_sha256": "84abfe23b54c8175b9b9d0def4656665c02e9671894bd5a3aa89b05ed14b1103",
+      "text": "坠入，无边噩梦",
+      "source_seconds": 6.048,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/坠入，无边噩梦.mp3",
+          "seconds": 6.048,
+          "sha256": "84abfe23b54c8175b9b9d0def4656665c02e9671894bd5a3aa89b05ed14b1103"
+        }
+      ]
+    },
+    "enemy_report_card_rebirth": {
+      "source": "newrecgen/烧掉了，也不会被遗忘.mp3",
+      "source_sha256": "806f0e7e4d0772009f2625a2b6b95aaec4c6d35069eefa0f507f60af1209893b",
+      "text": "烧掉了，也不会被遗忘",
+      "source_seconds": 6.744,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/烧掉了，也不会被遗忘.mp3",
+          "seconds": 6.744,
+          "sha256": "806f0e7e4d0772009f2625a2b6b95aaec4c6d35069eefa0f507f60af1209893b"
+        }
+      ]
+    },
+    "enemy_magician_master_summon": {
+      "source": "newrecgen/下一位，请登场.mp3",
+      "source_sha256": "d5a1c3c337189a0ce2d30ccb61a39093fa51f747c5065e4095233237184fffac",
+      "text": "下一位，请登场",
+      "source_seconds": 3.96,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/下一位，请登场.mp3",
+          "seconds": 3.96,
+          "sha256": "d5a1c3c337189a0ce2d30ccb61a39093fa51f747c5065e4095233237184fffac"
+        }
+      ]
+    },
+    "enemy_magician_master_card_ban": {
+      "source": "newrecgen/你的牌，不见了.mp3",
+      "source_sha256": "f9eeada6d4dd45e7631f5854299ea65c71f1d0c49135a86cc86d28df799f762e",
+      "text": "你的牌，不见了",
+      "source_seconds": 3.456,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/你的牌，不见了.mp3",
+          "seconds": 3.456,
+          "sha256": "f9eeada6d4dd45e7631f5854299ea65c71f1d0c49135a86cc86d28df799f762e"
+        }
+      ]
+    },
+    "enemy_magician_master_mind_read": {
+      "source": "newrecgen/我知道，你会选什么.mp3",
+      "source_sha256": "d5fd5773464e8340ab32b0ff502ecf630b225f8f20008fc7ff410723e1440482",
+      "text": "我知道，你会选什么",
+      "source_seconds": 4.056,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/我知道，你会选什么.mp3",
+          "seconds": 4.056,
+          "sha256": "d5fd5773464e8340ab32b0ff502ecf630b225f8f20008fc7ff410723e1440482"
+        }
+      ]
+    },
+    "enemy_self_destructive_pain_harm": {
+      "source": "newrecgen/自毁之痛楚.mp3",
+      "source_sha256": "630c301ca8ef67d4878a69148e3205daff7d09131a6c7d23c2e1d8dee72cf9c8",
+      "text": "自毁之痛楚",
+      "source_seconds": 4.056,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/自毁之痛楚.mp3",
+          "seconds": 4.056,
+          "sha256": "630c301ca8ef67d4878a69148e3205daff7d09131a6c7d23c2e1d8dee72cf9c8"
+        }
+      ]
+    },
+    "enemy_infirmary_demon_medicine": {
+      "source": "newrecgen/还想好起来，就继续吃药.mp3",
+      "source_sha256": "1bb9a04ee7136d62b919b50b06caa55e696010982cec4dd65983da74644cb84a",
+      "text": "还想好起来，就继续吃药",
+      "source_seconds": 6.864,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/还想好起来，就继续吃药.mp3",
+          "seconds": 6.864,
+          "sha256": "1bb9a04ee7136d62b919b50b06caa55e696010982cec4dd65983da74644cb84a"
+        }
+      ]
+    },
+    "enemy_infirmary_demon_isolate": {
+      "source": "newrecgen/别乱动，单独观察.mp3",
+      "source_sha256": "7859e06c78d544b5fba2640f8767566086717181e2780977e09d3852c5390966",
+      "text": "别乱动，单独观察",
+      "source_seconds": 4.728,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/别乱动，单独观察.mp3",
+          "seconds": 4.728,
+          "sha256": "7859e06c78d544b5fba2640f8767566086717181e2780977e09d3852c5390966"
+        }
+      ]
+    },
+    "enemy_infirmary_demon_critical": {
+      "source": "newrecgen/情况恶化，需要处理.mp3",
+      "source_sha256": "ce45c276d22b91b04d00c1a86b6b46544596a7ab3bd3e03e778d15ad0f6615a3",
+      "text": "情况恶化，需要处理",
+      "source_seconds": 4.056,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/情况恶化，需要处理.mp3",
+          "seconds": 4.056,
+          "sha256": "ce45c276d22b91b04d00c1a86b6b46544596a7ab3bd3e03e778d15ad0f6615a3"
+        }
+      ]
+    },
+    "enemy_infirmary_demon_anesthetic": {
+      "source": "newrecgen/放轻松，很快就安静了.mp3",
+      "source_sha256": "9a05de55703fde33d7d639e237de03a942d93b7b86933fc707e687c946bd9873",
+      "text": "放轻松，很快就安静了",
+      "source_seconds": 5.64,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/放轻松，很快就安静了.mp3",
+          "seconds": 5.64,
+          "sha256": "9a05de55703fde33d7d639e237de03a942d93b7b86933fc707e687c946bd9873"
+        }
+      ]
+    },
+    "enemy_bullied_phantom_opening": {
+      "source": "newrecgen/噩梦开幕.mp3",
+      "source_sha256": "24679586a32b37e807d8aa4834577971a1fd3e5a06b6ccfb95df8622a84587fe",
+      "text": "噩梦开幕",
+      "source_seconds": 8.064,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/噩梦开幕.mp3",
+          "seconds": 8.064,
+          "sha256": "24679586a32b37e807d8aa4834577971a1fd3e5a06b6ccfb95df8622a84587fe"
+        }
+      ]
+    },
+    "enemy_bullied_phantom_hand": {
+      "source": "newrecgen/谁能，拉我一把.mp3",
+      "source_sha256": "5ed51026929eb36fbf3d46f63f45592c7d9257a71f0ebb4670136518f59db476",
+      "text": "谁能，拉我一把",
+      "source_seconds": 6.24,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/谁能，拉我一把.mp3",
+          "seconds": 6.24,
+          "sha256": "5ed51026929eb36fbf3d46f63f45592c7d9257a71f0ebb4670136518f59db476"
+        }
+      ]
+    },
+    "enemy_bullied_phantom_summon": {
+      "source": "newrecgen/他们，又来了.mp3",
+      "source_sha256": "1c3350dacf1f5ee8fe156a6a186e7b2f639f354127103c4d70f7fe25d1ef2f65",
+      "text": "他们，又来了",
+      "source_seconds": 6.048,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/他们，又来了.mp3",
+          "seconds": 6.048,
+          "sha256": "1c3350dacf1f5ee8fe156a6a186e7b2f639f354127103c4d70f7fe25d1ef2f65"
+        }
+      ]
+    },
+    "enemy_bullied_phantom_tell": {
+      "source": "newrecgen/不准告人，他们说的.mp3",
+      "source_sha256": "e859dd5f5ec077460a1f9218cc0ea74657c769278f9463873e2f3c040b98fe75",
+      "text": "不准告人，他们说的",
+      "source_seconds": 6.048,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/不准告人，他们说的.mp3",
+          "seconds": 6.048,
+          "sha256": "e859dd5f5ec077460a1f9218cc0ea74657c769278f9463873e2f3c040b98fe75"
+        }
+      ]
+    },
+    "enemy_claustrophobic_box_suffocate": {
+      "source": "newrecgen/再靠近一点.mp3",
+      "source_sha256": "87356aaad591e139417b585454f4c0559a7dc7fb909b023ae16a41be0f154cea",
+      "text": "再靠近一点",
+      "source_seconds": 5.232,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/再靠近一点.mp3",
+          "seconds": 5.232,
+          "sha256": "87356aaad591e139417b585454f4c0559a7dc7fb909b023ae16a41be0f154cea"
+        }
+      ]
+    },
+    "enemy_claustrophobic_box_compress": {
+      "source": "newrecgen/留给你的，只剩这些.mp3",
+      "source_sha256": "0214de28f4f76ea42a5cff2f14cd159e9ce67c51ee76b4fe7a26af5a0602d8ae",
+      "text": "留给你的，只剩这些",
+      "source_seconds": 6.048,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/留给你的，只剩这些.mp3",
+          "seconds": 6.048,
+          "sha256": "0214de28f4f76ea42a5cff2f14cd159e9ce67c51ee76b4fe7a26af5a0602d8ae"
+        }
+      ]
+    },
+    "enemy_inverse_limit_low_state": {
+      "source": "newrecgen/今天，也就这样了.mp3",
+      "source_sha256": "30f5bdca021efc9b15bb86c23d41de867f4099b1eed13e604d26317e6072e32f",
+      "text": "今天，也就这样了",
+      "source_seconds": 4.248,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/今天，也就这样了.mp3",
+          "seconds": 4.248,
+          "sha256": "30f5bdca021efc9b15bb86c23d41de867f4099b1eed13e604d26317e6072e32f"
+        }
+      ]
+    },
+    "enemy_inverse_limit_warmup": {
+      "source": "newrecgen/就这点准备.mp3",
+      "source_sha256": "befd22e6fcda264fbd02f040ea40efe135b5f457ef94fe4f5aef5fab8f7ac56e",
+      "text": "就这点准备",
+      "source_seconds": 3.552,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/就这点准备.mp3",
+          "seconds": 3.552,
+          "sha256": "befd22e6fcda264fbd02f040ea40efe135b5f457ef94fe4f5aef5fab8f7ac56e"
+        }
+      ]
+    },
+    "enemy_inverse_limit_downpour": {
+      "source": "newrecgen/暴雨，全都压下来吧.mp3",
+      "source_sha256": "95866f641d53d5e47cd8d2cfee3263bd3635f9aff470af0f1e93e19e976070a2",
+      "text": "暴雨，全都压下来吧",
+      "source_seconds": 4.56,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/暴雨，全都压下来吧.mp3",
+          "seconds": 4.56,
+          "sha256": "95866f641d53d5e47cd8d2cfee3263bd3635f9aff470af0f1e93e19e976070a2"
+        }
+      ]
+    },
+    "enemy_inverse_limit_tendon": {
+      "source": "newrecgen/听见了吗，你已经撑不住了.mp3",
+      "source_sha256": "daff336eb47913f5f09c25f645d1b88182f285be841d3980396db83f7dab80ca",
+      "text": "听见了吗，你已经撑不住了",
+      "source_seconds": 5.448,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/听见了吗，你已经撑不住了.mp3",
+          "seconds": 5.448,
+          "sha256": "daff336eb47913f5f09c25f645d1b88182f285be841d3980396db83f7dab80ca"
+        }
+      ]
+    },
+    "enemy_inverse_limit_pressure": {
+      "source": "newrecgen/你的极限，就在这里（多种）.mp3",
+      "source_sha256": "47c508945d8a8af7283f650d8d5eb39d7503c01cca61f9294143c2b8a5fc91c9",
+      "text": "你的极限，就在这里",
+      "source_seconds": 9.864,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/enemy_inverse_limit_pressure_01.wav",
+          "seconds": 3.2,
+          "start_seconds": 0.0,
+          "end_seconds": 3.2,
+          "sha256": "caed7baee5301297f5fcfc251f56f57ab244748e23ec731c72020f200e84b783"
+        },
+        {
+          "path": "res://assets/audio/battle_voice/enemy_inverse_limit_pressure_02.wav",
+          "seconds": 3.4,
+          "start_seconds": 3.2,
+          "end_seconds": 6.6,
+          "sha256": "e0b5da671a48dbc6595fe05c7fdc20821e5c4abad90678ff1f0bcc466060d82d"
+        },
+        {
+          "path": "res://assets/audio/battle_voice/enemy_inverse_limit_pressure_03.wav",
+          "seconds": 3.264,
+          "start_seconds": 6.6,
+          "end_seconds": 9.864,
+          "sha256": "7c6fcf1a8ca94113136d0fcd762744074f63fe8fdcbd87fa7010005808d2f423"
+        }
+      ]
+    },
+    "enemy_inverse_limit_mirror": {
+      "source": "newrecgen/看清你自己（多种）.mp3",
+      "source_sha256": "6615a1f8671436924732e764efc37e24e282edad79d1a9e6267627f87349253b",
+      "text": "看清你自己",
+      "source_seconds": 16.056,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/enemy_inverse_limit_mirror_01.wav",
+          "seconds": 2.0,
+          "start_seconds": 0.6,
+          "end_seconds": 2.6,
+          "sha256": "d7f56a5b9a87ea2da9f6c735be401cb446325cb9e3f020a8dd7234fe9d061ddb"
+        },
+        {
+          "path": "res://assets/audio/battle_voice/enemy_inverse_limit_mirror_02.wav",
+          "seconds": 2.2,
+          "start_seconds": 4.75,
+          "end_seconds": 6.95,
+          "sha256": "ac61fb712762cc28fed9089345ee21043be61dc81457ddd95ca683fc92a183f7"
+        },
+        {
+          "path": "res://assets/audio/battle_voice/enemy_inverse_limit_mirror_03.wav",
+          "seconds": 2.45,
+          "start_seconds": 8.8,
+          "end_seconds": 11.25,
+          "sha256": "023e90cccdbbbea99f0c638c481743dc670eb6a949d9d6a1ff7bbd2d20f06857"
+        }
+      ]
+    },
+    "enemy_terminal_echo_step": {
+      "source": "newrecgen/只要再迈一步，就好.mp3",
+      "source_sha256": "87b2435e29444213b962efdb0e66743f3811be009e6f1c41e678735a958be88d",
+      "text": "只要再迈一步，就好",
+      "source_seconds": 6.048,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/只要再迈一步，就好.mp3",
+          "seconds": 6.048,
+          "sha256": "87b2435e29444213b962efdb0e66743f3811be009e6f1c41e678735a958be88d"
+        }
+      ]
+    },
+    "enemy_terminal_echo_tired": {
+      "source": "newrecgen/你只是累了，来加入我们吧.mp3",
+      "source_sha256": "68a21308be248b75c095a59fea1ad8b19b26ac57968dfe4e885c1b4b64a87a80",
+      "text": "你只是累了，来加入我们吧",
+      "source_seconds": 6.048,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/你只是累了，来加入我们吧.mp3",
+          "seconds": 6.048,
+          "sha256": "68a21308be248b75c095a59fea1ad8b19b26ac57968dfe4e885c1b4b64a87a80"
+        }
+      ]
+    },
+    "enemy_terminal_echo_ultimatum": {
+      "source": "newrecgen/你还要，拒绝吗（终结技用）.mp3",
+      "source_sha256": "3bf6bd1c08648abae6fa7c8fc62746d74b1f462ae1a5cf23b71868a9d2d4a8ca",
+      "text": "你还要，拒绝吗",
+      "source_seconds": 4.848,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/你还要，拒绝吗（终结技用）.mp3",
+          "seconds": 4.848,
+          "sha256": "3bf6bd1c08648abae6fa7c8fc62746d74b1f462ae1a5cf23b71868a9d2d4a8ca"
+        }
+      ]
+    },
+    "enemy_whisper_silhouette_nullify": {
+      "source": "newrecgen/无意义.mp3",
+      "source_sha256": "61c6e7f9168ef0ac666307becde4798bf36b88964477981bd8167c46bb4742c7",
+      "text": "无意义",
+      "source_seconds": 4.56,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/无意义.mp3",
+          "seconds": 4.56,
+          "sha256": "61c6e7f9168ef0ac666307becde4798bf36b88964477981bd8167c46bb4742c7"
+        }
+      ]
+    },
+    "enemy_terminal_choir_void": {
+      "source": "newrecgen/没有人，在等你.mp3",
+      "source_sha256": "fe81b69ddf8d7ccd84ea01f655d969f9384bc5ab00e775a3f4835f63bc4542a8",
+      "text": "没有人，在等你",
+      "source_seconds": 6.744,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/没有人，在等你.mp3",
+          "seconds": 6.744,
+          "sha256": "fe81b69ddf8d7ccd84ea01f655d969f9384bc5ab00e775a3f4835f63bc4542a8"
+        }
+      ]
+    },
+    "enemy_false_dawn_lock": {
+      "source": "newrecgen/来吧，来吧.mp3",
+      "source_sha256": "1f24b2b5d4b66120605a3977bec525be7a8b76e43d21e7c05d37accfa5a76f63",
+      "text": "来吧，来吧",
+      "source_seconds": 4.56,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/来吧，来吧.mp3",
+          "seconds": 4.56,
+          "sha256": "1f24b2b5d4b66120605a3977bec525be7a8b76e43d21e7c05d37accfa5a76f63"
+        }
+      ]
+    },
+    "assist_anya_refuse_ending": {
+      "source": "newrecgen/我不接受，这样的结局.mp3",
+      "source_sha256": "91fe1db3daa84da5befee53438c3a3c1d0da10e1d783d4ed92777ecc670cdc9b",
+      "text": "我不接受，这样的结局",
+      "source_seconds": 5.064,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/我不接受，这样的结局.mp3",
+          "seconds": 5.064,
+          "sha256": "91fe1db3daa84da5befee53438c3a3c1d0da10e1d783d4ed92777ecc670cdc9b"
+        }
+      ]
+    },
+    "assist_anya_reconcile": {
+      "source": "newrecgen/你不用，一个人扛着.mp3",
+      "source_sha256": "fcf835b4846a42a912e918c7a5260392f9f5836c0aae1cfffe14c0f7c06274a9",
+      "text": "你不用，一个人扛着",
+      "source_seconds": 5.352,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/你不用，一个人扛着.mp3",
+          "seconds": 5.352,
+          "sha256": "fcf835b4846a42a912e918c7a5260392f9f5836c0aae1cfffe14c0f7c06274a9"
+        }
+      ]
+    },
+    "assist_anya_refuse": {
+      "source": "newrecgen/不，我拒绝.mp3",
+      "source_sha256": "9a7ebc0c5178bed0217693cf8558841b53c980d7e5c75a014f3a1bca867819f6",
+      "text": "不，我拒绝",
+      "source_seconds": 3.768,
+      "variants": [
+        {
+          "path": "res://assets/audio/battle_voice/不，我拒绝.mp3",
+          "seconds": 3.768,
+          "sha256": "9a7ebc0c5178bed0217693cf8558841b53c980d7e5c75a014f3a1bca867819f6"
+        }
+      ]
+    }
+  },
+  "ultimates": {
+    "hero_zhoumingyuan_none_ultimate": {
+      "source": "newrecgen/我们，永不言弃.mp3",
+      "source_sha256": "ad8671382bfbbbf9285699f466f2865b31663cdefaa21b6e5ae029468a2c79f6",
+      "text": "我们，永不言弃",
+      "source_seconds": 3.048,
+      "variants": [
+        {
+          "path": "res://assets/audio/ultimate_voice/我们，永不言弃.mp3",
+          "seconds": 3.048,
+          "sha256": "ad8671382bfbbbf9285699f466f2865b31663cdefaa21b6e5ae029468a2c79f6"
+        }
+      ]
+    },
+    "hero_zhoumingyuan_math_ultimate": {
+      "source": "newrecgen/看清了，解已确定.mp3",
+      "source_sha256": "5dd7cd5afd06c765a57c2efde2f81e0129de7735549f832a8d597cb86ccff225",
+      "text": "看清了，解已确定",
+      "source_seconds": 3.144,
+      "variants": [
+        {
+          "path": "res://assets/audio/ultimate_voice/看清了，解已确定.mp3",
+          "seconds": 3.144,
+          "sha256": "5dd7cd5afd06c765a57c2efde2f81e0129de7735549f832a8d597cb86ccff225"
+        }
+      ]
+    },
+    "hero_alyina_ultimate": {
+      "source": "newrecgen/来吧，发起总攻.mp3",
+      "source_sha256": "82c51c50525135fa4ebc0a396c42bc70be445448883899078587a56259fa5d96",
+      "text": "来吧，发起总攻",
+      "source_seconds": 3.456,
+      "variants": [
+        {
+          "path": "res://assets/audio/ultimate_voice/来吧，发起总攻.mp3",
+          "seconds": 3.456,
+          "sha256": "82c51c50525135fa4ebc0a396c42bc70be445448883899078587a56259fa5d96"
+        }
+      ]
+    },
+    "hero_chenmo_ultimate": {
+      "source": "newrecgen/都往我这边站.mp3",
+      "source_sha256": "45f94bf552fe30338965ad797c26dcc27647c0bc1d343fe04df353504e9a4580",
+      "text": "都往我这边站",
+      "source_seconds": 1.944,
+      "variants": [
+        {
+          "path": "res://assets/audio/ultimate_voice/都往我这边站.mp3",
+          "seconds": 1.944,
+          "sha256": "45f94bf552fe30338965ad797c26dcc27647c0bc1d343fe04df353504e9a4580"
+        }
+      ]
+    },
+    "hero_wangjiaqi_ultimate": {
+      "source": "newrecgen/看好了，这才叫魔术.mp3",
+      "source_sha256": "33130ea9ebaf2731b4a68f4f12f731d0abcadb8c9ac06053390a6587d3eb9c18",
+      "text": "看好了，这才叫魔术",
+      "source_seconds": 2.832,
+      "variants": [
+        {
+          "path": "res://assets/audio/ultimate_voice/看好了，这才叫魔术.mp3",
+          "seconds": 2.832,
+          "sha256": "33130ea9ebaf2731b4a68f4f12f731d0abcadb8c9ac06053390a6587d3eb9c18"
+        }
+      ]
+    },
+    "hero_xumingming_ultimate": {
+      "source": "newrecgen/这一轮，全力冲刺.mp3",
+      "source_sha256": "fc15abdb767cb93d45a5c4bf12322faceabbdc751d231a4cb1013d971dbf0205",
+      "text": "这一轮，全力冲刺",
+      "source_seconds": 3.048,
+      "variants": [
+        {
+          "path": "res://assets/audio/ultimate_voice/这一轮，全力冲刺.mp3",
+          "seconds": 3.048,
+          "sha256": "fc15abdb767cb93d45a5c4bf12322faceabbdc751d231a4cb1013d971dbf0205"
+        }
+      ]
+    },
+    "hero_suwanqing_ultimate": {
+      "source": "newrecgen/藏不住了吧，该爆料了.mp3",
+      "source_sha256": "d117d090fdd1d6480800110baad3baeb2730e67827f679a95b9dbdf55e0cdb7c",
+      "text": "藏不住了吧，该爆料了",
+      "source_seconds": 3.048,
+      "variants": [
+        {
+          "path": "res://assets/audio/ultimate_voice/藏不住了吧，该爆料了.mp3",
+          "seconds": 3.048,
+          "sha256": "d117d090fdd1d6480800110baad3baeb2730e67827f679a95b9dbdf55e0cdb7c"
+        }
+      ]
+    },
+    "hero_liudanya_ultimate": {
+      "source": "newrecgen/这一笔，一气呵成.mp3",
+      "source_sha256": "5d327531ac02a74b85170b26ac093701f2f26f05f07905adda5750e8603ef9fb",
+      "text": "这一笔，一气呵成",
+      "source_seconds": 2.832,
+      "variants": [
+        {
+          "path": "res://assets/audio/ultimate_voice/这一笔，一气呵成.mp3",
+          "seconds": 2.832,
+          "sha256": "5d327531ac02a74b85170b26ac093701f2f26f05f07905adda5750e8603ef9fb"
+        }
+      ]
+    },
+    "hero_anya_enter": {
+      "source": "newrecgen/找到我，然后拯救我.mp3",
+      "source_sha256": "d4418a9173b5be7fe2e4351a704eabbfd4f74dfc7215a94db6ec8b8a297c7870",
+      "text": "找到我，然后拯救我",
+      "source_seconds": 5.64,
+      "variants": [
+        {
+          "path": "res://assets/audio/ultimate_voice/找到我，然后拯救我.mp3",
+          "seconds": 5.64,
+          "sha256": "d4418a9173b5be7fe2e4351a704eabbfd4f74dfc7215a94db6ec8b8a297c7870"
+        }
+      ]
+    },
+    "hero_anya_return": {
+      "source": "newrecgen/这一次，我们在一起.mp3",
+      "source_sha256": "414c8ce906ec916dc53c0f2f2f2cccab26d5ac9715bd607c669437e6a350aa07",
+      "text": "这一次，我们在一起",
+      "source_seconds": 3.048,
+      "variants": [
+        {
+          "path": "res://assets/audio/ultimate_voice/这一次，我们在一起.mp3",
+          "seconds": 3.048,
+          "sha256": "414c8ce906ec916dc53c0f2f2f2cccab26d5ac9715bd607c669437e6a350aa07"
+        }
+      ]
+    },
+    "hero_anya_defeated": {
+      "source": "newrecgen/我在，别松开我的手.mp3",
+      "source_sha256": "be533040d0fe0cb0d951586f80f9354458e42418a30e27c74723cca3c0102ad5",
+      "text": "我在，别松开我的手",
+      "source_seconds": 3.552,
+      "variants": [
+        {
+          "path": "res://assets/audio/ultimate_voice/我在，别松开我的手.mp3",
+          "seconds": 3.552,
+          "sha256": "be533040d0fe0cb0d951586f80f9354458e42418a30e27c74723cca3c0102ad5"
+        }
+      ]
+    }
+  }
+}

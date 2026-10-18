@@ -1,0 +1,12 @@
+.godot/
+build/
+*.exe
+*.apk
+*.pck
+*.idsig
+*.log
+*.keystore
+*.jks
+.env*
+data/tower_report_keys.json
+export_credentials.cfg

@@ -1,0 +1,28 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/actors/follower.gd" id="1_follower"]
+[ext_resource type="Script" path="res://scripts/actors/actor_sprite.gd" id="2_sprite"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_body"]
+radius = 8.0
+
+; 跟宠（艾莉娜）。由 `CollegeMap._ensure_follower()` 在**每个大学场景**里自动生成，
+; 所以这个 .tscn 不需要被任何地图场景引用。
+; ⚠️ 分组是 "follower"，**不是** "player" 也不是 "npc" —— 理由见 follower.gd 的文件头。
+; ⚠️ collision_layer = 0（别人看不见它）、collision_mask = 1（只撞墙，不顶开玩家）。
+
+[node name="Follower" type="CharacterBody2D" groups=["follower"]]
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("1_follower")
+require_flag = "alyina_follows"
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -8)
+texture_filter = 1
+script = ExtResource("2_sprite")
+sheet_path = "res://assets/graphics/characters/celia_walk.webp"
+
+[node name="Body" type="CollisionShape2D" parent="."]
+position = Vector2(0, 4)
+shape = SubResource("CircleShape2D_body")
