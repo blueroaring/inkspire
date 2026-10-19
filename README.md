@@ -3,7 +3,7 @@
 尖塔独立战斗游戏。更新后沿用固定用户存档目录，支持游戏内存档迁移。
 
 - Godot 4.7.2，Compatibility 渲染器，Windows x86_64 / Android ARM64 / Web。
-- 官网：https://inkspire-game.freemyip.com/
+- 官网：https://4.216.111.118/
 - **Android APK 未经真机测试，不保证能够安装、启动或正常游玩。**
 - 此源码和安装包不含作者或玩家存档、战斗报告、缓存、历史构建、制作原图或网站管理凭据。
 
