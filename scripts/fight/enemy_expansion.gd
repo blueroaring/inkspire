@@ -1,4 +1,5 @@
 extends RefCounted
+const STATUS := preload("res://scripts/fight/status_rules.gd")
 ## Additional 14.md enemies. State lives on units so combat previews can copy it.
 const IDS := ["gaokao_countdown", "report_card", "quiet_hacker", "magician_master", "self_destructive_pain", "infirmary_demon", "bullied_phantom", "fist_phantom", "whip_phantom", "bruised_hand", "shackle_phantom", "claustrophobic_box"]
 const SUMMONS := ["fist_phantom", "whip_phantom", "bruised_hand", "shackle_phantom"]
@@ -11,21 +12,21 @@ static func setup(unit: Dictionary) -> void:
 	if unit.id == "report_card":
 		unit.revivals = 0
 		unit.revive_on = -1
-		unit.statuses.damage_cap = {"name":"难以销毁", "desc":"每段攻击造成的生命伤害有上限；前两次倒下后会短暂失去实体，再以部分生命复生。", "turns":-1, "debuff":false, "uncleansable":true}
+		unit.statuses.damage_cap = {"name":"难以销毁", "desc":"每段攻击造成的生命伤害有上限；前两次倒下后会短暂失去实体，再以部分生命复生。", "turns":-1, "debuff":false, "uncleansable":true, "category":"passive"}
 	if unit.id == "self_destructive_pain": unit.hp = maxi(1, roundi(float(unit.max_hp) * 0.5))
-	if unit.id == "magician_master": unit.statuses.evasion = {"name":"遁逃术", "desc":"有50%概率闪避每段直接攻击；毒和反伤不受影响。", "turns":-1, "debuff":false, "uncleansable":true}
+	if unit.id == "magician_master": unit.statuses.evasion = {"name":"遁逃术", "desc":"有50%概率闪避每段直接攻击；毒和反伤不受影响。", "turns":-1, "debuff":false, "uncleansable":true, "category":"passive"}
 	if unit.id == "bullied_phantom":
 		unit.assist_charge = 0
 		unit.summon_cursor = 0
 		unit.summon_due = true
 		unit.support_step = 0
 		unit.expansion_opened = false
-		unit.statuses.helpless = {"name":"习得性无助", "desc":"本体不攻击；召唤幻影、施加干扰。部分幻影与本体共享生命。击败幻影为反抗援助充能。", "turns":-1, "debuff":false, "uncleansable":true}
+		unit.statuses.helpless = {"name":"习得性无助", "desc":"本体不攻击；召唤幻影、施加干扰。部分幻影与本体共享生命。击败幻影为反抗援助充能。", "turns":-1, "debuff":false, "uncleansable":true, "category":"passive"}
 	if unit.id in ["fist_phantom", "whip_phantom", "shackle_phantom"]:
 		unit.summon_hits = 5 if unit.id != "whip_phantom" else 3
 		update_summon_hits(unit)
-	if unit.id == "claustrophobic_box": unit.statuses.no_escape = {"name":"无处可逃", "desc":"在场时手牌上限为8；满手牌打出一张后抽一张。空间压缩可将上限降至2张。", "turns":-1, "debuff":false, "uncleansable":true}
-	if unit.id == "infirmary_demon": unit.statuses.blood_draw = {"name":"抽血", "desc":"攻击造成生命伤害时，回复该伤害150%的生命。", "turns":-1, "debuff":false, "uncleansable":true}
+	if unit.id == "claustrophobic_box": unit.statuses.no_escape = {"name":"无处可逃", "desc":"在场时手牌上限为8；满手牌打出一张后抽一张。空间压缩可将上限降至2张。", "turns":-1, "debuff":false, "uncleansable":true, "category":"rule"}
+	if unit.id == "infirmary_demon": unit.statuses.blood_draw = {"name":"抽血", "desc":"攻击造成生命伤害时，回复该伤害150%的生命。", "turns":-1, "debuff":false, "uncleansable":true, "category":"passive"}
 
 static func start(s: Node) -> void:
 	for i in s.enemies.size():
@@ -217,7 +218,7 @@ static func resolve(s: Node, index: int) -> bool:
 		if effect == "critical" or effect == "countdown_burst":
 			if effect == "critical":
 				for status_id in s.allies[hit_target].statuses.keys():
-					if not bool(s.allies[hit_target].statuses[status_id].get("debuff", false)) and not bool(s.allies[hit_target].statuses[status_id].get("uncleansable", false)): s.allies[hit_target].statuses.erase(status_id)
+					if STATUS.is_buff(s.allies[hit_target].statuses[status_id]) and not bool(s.allies[hit_target].statuses[status_id].get("uncleansable", false)): s.allies[hit_target].statuses.erase(status_id)
 		var result := attack(s, index, hit_target, int(intent.damage), String(intent.name), effect == "numb" or s.allies[hit_target].statuses.has("isolation")) if int(intent.damage) > 0 else {"hp":0,"guard":0}
 		match effect:
 			"countdown_hit": add_debuff(s, hit_target, "weakness", "虚弱", "造成的伤害降低25%。", 1, {"damage_out_mult":0.75})
@@ -291,7 +292,7 @@ static func resolve(s: Node, index: int) -> bool:
 			e.summon_due = true
 			e.support_step = int(e.get("support_step", 0)) + 1
 			for id in e.statuses.keys():
-				if bool(e.statuses[id].get("debuff", false)): e.statuses.erase(id)
+				if STATUS.is_debuff(e.statuses[id]): e.statuses.erase(id)
 			for minion in s.enemies:
 				if int(minion.get("summoner", -1)) == index and s._is_alive(minion): s.ENEMY_RULES.buff(minion, "phantom_power", "消毒水雾", 0.12, 5)
 		"do_not_tell":
@@ -325,7 +326,7 @@ static func incoming(s: Node, target: Dictionary, amount: int) -> int:
 	return amount
 
 static func update_summon_hits(unit: Dictionary) -> void:
-	unit.statuses.summon_hits = {"name":"被攻击计数 %d" % int(unit.summon_hits), "desc":"每次受到直接攻击减少1；归零时消散。多段攻击逐段计算，护盾吸收也计入。", "turns":-1, "badge_text":str(unit.summon_hits), "debuff":false, "uncleansable":true}
+	unit.statuses.summon_hits = {"name":"被攻击计数 %d" % int(unit.summon_hits), "desc":"每次受到直接攻击减少1；归零时消散。多段攻击逐段计算，护盾吸收也计入。", "turns":-1, "badge_text":str(unit.summon_hits), "debuff":false, "uncleansable":true, "category":"counter"}
 
 static func sync_shared_life(s: Node, boss_index: int) -> void:
 	if boss_index < 0 or boss_index >= s.enemies.size(): return

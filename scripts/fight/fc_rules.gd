@@ -1,4 +1,5 @@
 extends RefCounted
+const STATUS := preload("res://scripts/fight/status_rules.gd")
 const COMPANIONS := preload("res://scripts/fight/fc_companions.gd")
 const POISON := preload("res://scripts/fight/fc_poison.gd")
 const PAINTING := preload("res://scripts/fight/fc_painting.gd")
@@ -224,7 +225,7 @@ func status(owner: int, id: String, turns: int, extra: Dictionary = {}) -> bool:
 	var value := {"name":id, "turns":turns, "debuff":false}
 	value.merge(extra, true)
 	value = POISON.STATUS.definition(id, value)
-	if bool(value.debuff): return POISON.debuff(s.allies[owner], id, value)
+	if STATUS.is_debuff(value): return POISON.debuff(s.allies[owner], id, value)
 	s.allies[owner].statuses[id] = value
 	return true
 
@@ -249,7 +250,7 @@ func cleanse(index: int, one_layer: bool, only_id: String = "") -> void:
 	for id in ordered:
 		if not only_id.is_empty() and id != only_id: continue
 		if bool(statuses[id].get("uncleansable", false)): continue
-		if not bool(statuses[id].get("debuff", false)): continue
+		if not STATUS.is_debuff(statuses[id]): continue
 		if id in ["sleep_bad", "love", "hidden_pain", "void", "forgetfulness"]:
 			statuses.erase(id)
 			break

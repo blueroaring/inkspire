@@ -12,6 +12,7 @@ var _scroll: ScrollContainer
 var _rows: GridContainer
 var _empty: Label
 var _buttons: Dictionary = {}
+var _mobile_category: OptionButton
 
 func _ready() -> void:
 	name = "MechanicsGuide"
@@ -61,21 +62,43 @@ func _ready() -> void:
 	_categories.resized.connect(_layout_scroll)
 	_layout()
 	_filter()
+	if preload("res://scripts/ui/tower_mobile.gd").enabled():
+		title.hide()
+		_count.hide()
+		_categories.hide()
+		_mobile_category = OptionButton.new()
+		_mobile_category.add_theme_font_size_override("font_size", 36)
+		for key in DATA.CATEGORIES: _mobile_category.add_item(DATA.CATEGORIES[key])
+		_mobile_category.item_selected.connect(func(index: int): select_category(String(DATA.CATEGORIES.keys()[index])))
+		add_child(_mobile_category)
+		_layout()
 
 func _layout() -> void:
 	if not is_instance_valid(_search): return
-	var narrow := size.x < 1100
+	var narrow := size.x < 1100 or preload("res://scripts/ui/tower_mobile.gd").enabled()
 	_search.position = Vector2(0, 84) if narrow else Vector2(size.x - 540, 5)
 	_search.size = Vector2(size.x if narrow else 540, 44)
 	_categories.position = Vector2(0, 142 if narrow else 90)
 	_categories.size.x = size.x
 	_rows.columns = 1 if narrow else 2
 	_count.size.x = size.x
+	if preload("res://scripts/ui/tower_mobile.gd").enabled():
+		_search.position = Vector2.ZERO
+		_search.size = Vector2(size.x * 0.60 - 24, 144)
+		_search.add_theme_font_size_override("font_size", 36)
+		if is_instance_valid(_mobile_category):
+			_mobile_category.position = Vector2(size.x * 0.60, 0)
+			_mobile_category.size = Vector2(size.x * 0.4, 144)
+		_categories.position.y = 196
+		for button in _buttons.values():
+			button.custom_minimum_size = Vector2(250, 90)
+			button.add_theme_font_size_override("font_size", 28)
+		preload("res://scripts/ui/tower_mobile_layout.gd").readable_tree(_rows, 38)
 	_layout_scroll()
 
 func _layout_scroll() -> void:
 	if not is_instance_valid(_scroll): return
-	var top := _categories.position.y + maxf(42, _categories.size.y) + 18
+	var top := 174.0 if preload("res://scripts/ui/tower_mobile.gd").enabled() else _categories.position.y + maxf(42, _categories.size.y) + 18
 	_scroll.position = Vector2(0, top)
 	_scroll.size = Vector2(size.x, maxf(80, size.y - top))
 	_empty.position = _scroll.position + Vector2(10, 24)

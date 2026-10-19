@@ -53,7 +53,7 @@ static func can_guard(unit: Dictionary) -> bool:
 	return not unit.statuses.has("no_guard") and not unit.statuses.has("athlete_burst")
 
 static func cleansable(unit: Dictionary) -> Array:
-	return unit.statuses.keys().filter(func(id: String) -> bool: return bool(unit.statuses[id].get("debuff", false)) and not bool(unit.statuses[id].get("uncleansable", false)))
+	return unit.statuses.keys().filter(func(id: String) -> bool: return STATUS.is_debuff(unit.statuses[id]) and not bool(unit.statuses[id].get("uncleansable", false)))
 
 static func receives_healing(s: Node, unit: Dictionary) -> bool:
 	if s.fc.COMPANIONS.healing_blocked(unit): return false
@@ -103,7 +103,7 @@ static func before_discard(s: Node) -> void:
 			break
 
 static func dispellable(unit: Dictionary) -> Array:
-	return unit.statuses.keys().filter(func(id: String) -> bool: return not bool(unit.statuses[id].get("debuff", false)) and not bool(unit.statuses[id].get("uncleansable", false)))
+	return unit.statuses.keys().filter(func(id: String) -> bool: return STATUS.is_buff(unit.statuses[id]) and not bool(unit.statuses[id].get("uncleansable", false)))
 
 static func mint_targets(unit: Dictionary) -> Array:
 	return cleansable(unit).filter(func(id: String) -> bool: return id in ["weakness", "sleep_bad"])

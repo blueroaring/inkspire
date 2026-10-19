@@ -6,6 +6,7 @@ var unit: Dictionary = {}
 var ultimate: Dictionary = {}
 
 func _ready() -> void:
+	preload("res://scripts/ui/tower_mobile.gd").register_back(self, queue_free)
 	name = "UltimateReference"
 	size = Vector2(1920, 1080)
 	z_index = 220
@@ -36,6 +37,12 @@ func _ready() -> void:
 	M.paragraph(words, charge, Rect2(), 23, T.MUTED)
 	M.paragraph(words, String(ultimate.get("desc", "")), Rect2(), 25)
 	M.paragraph(words, "目标：" + FightData.target_name(String(ultimate.get("target", "self"))), Rect2(), 21, T.MUTED)
+	if preload("res://scripts/ui/tower_mobile.gd").enabled():
+		for child in pane.get_children():
+			if child is Button: child.position = Vector2(1330, 12); child.size = Vector2(310, 120); child.add_theme_font_size_override("font_size", 36)
+		scroll.position.y = 150
+		scroll.size.y = 650
+		preload("res://scripts/ui/tower_mobile_layout.gd").readable_tree(words, 38)
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel") or event.is_action_pressed("pause"):

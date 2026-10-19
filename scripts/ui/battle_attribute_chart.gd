@@ -11,6 +11,9 @@ var _centers: Dictionary = {}
 var _details: Panel
 
 func _ready() -> void:
+	if preload("res://scripts/ui/tower_mobile.gd").enabled():
+		_mobile_chart()
+		return
 	name = "AttributeChart"
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var graph := V.panel(self, Rect2(0, 0, 976, 600), THEME.SURFACE, Color(THEME.LINE, 0.55), 6)
@@ -99,3 +102,23 @@ func _matchup_row(source: String, target: String, y: float, tint: Color, modifie
 	HINT.icon(_details, target, Rect2(256, y + 5, 32, 32))
 	V.text(_details, FightData.attr_name(target), Rect2(298, y, 74, 42), 20, THEME.TEXT)
 	V.text(_details, modifier, Rect2(390, y, 120, 42), 23, tint, true)
+
+func _mobile_chart() -> void:
+	var pages := preload("res://scripts/ui/tower_mobile_pages.gd")
+	var scroll := ScrollContainer.new()
+	scroll.size = size if size.x > 0 else Vector2(1544, 600)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	add_child(scroll)
+	var rows := VBoxContainer.new()
+	rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	rows.add_theme_constant_override("separation", 24)
+	scroll.add_child(rows)
+	pages.text(rows, "属性克制 · 造成伤害 +50%，被克制 −50%", 42)
+	pages.text(rows, "无极与同属性之间均无克制修正。")
+	for attribute in FightData.ADVANTAGE:
+		var targets := PackedStringArray()
+		var sources := PackedStringArray()
+		for target in FightData.ADVANTAGE[attribute]: targets.append(FightData.attr_name(target))
+		for source in FightData.ADVANTAGE:
+			if FightData.has_advantage(source, attribute): sources.append(FightData.attr_name(source))
+		pages.text(rows, "%s\n克制：%s\n被克制：%s" % [FightData.attr_name(attribute), " / ".join(targets), " / ".join(sources)])

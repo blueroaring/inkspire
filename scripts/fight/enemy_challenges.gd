@@ -1,4 +1,5 @@
 extends RefCounted
+const STATUS := preload("res://scripts/fight/status_rules.gd")
 ## Extra encounter state stays on units so previews and lab resets remain isolated.
 const IDS := ["math_exam", "perfect_score", "inverse_limit"]
 const FUNCTIONS := ["x", "x+4", "x+3√x+5", "|2x-1|+8", "2x+10", "2x+x²/(x+6)+12", "3x+12", "3x+2^(min(x,8)/2)+12", "4x+24", "4x+x²/(x+6)+30"]
@@ -21,16 +22,16 @@ static func setup(e: Dictionary) -> void:
 static func field(e: Dictionary) -> void:
 	var stage := int(e.boss_phase)
 	var words := ["脚滑：我方普通攻击、技能与追击每段基础伤害减少S(2)，最低0；毒爆和反伤等固定伤害不受影响。", "伤病复发：每打出一张攻击牌，使用者获得1层隐痛；回合结束一次性失去等于层数的生命，净化清空全部隐痛。", "镜像复制：每回合回放上一回合第一张攻击牌的伤害段，全部指向原使用者；不复制其他效果。"]
-	e.statuses.challenge_field = {"name":["阴雨低压", "旧伤回响", "破限镜像"][stage - 1], "art_key":["field_rain", "field_wound", "field_mirror"][stage - 1], "desc":words[stage - 1], "turns":-1, "uncleansable":true, "debuff":false}
+	e.statuses.challenge_field = {"name":["阴雨低压", "旧伤回响", "破限镜像"][stage - 1], "art_key":["field_rain", "field_wound", "field_mirror"][stage - 1], "desc":words[stage - 1], "turns":-1, "uncleansable":true, "debuff":false, "category":"rule"}
 
 static func exam_guard(e: Dictionary) -> int:
 	return 40 + roundi(maxi(0, int(e.level) - 1) * (1.2 if TowerRun.active else 2.0))
 
 static func describe_function(e: Dictionary) -> void:
-	e.statuses.exam_function = {"name":"函数 · " + FUNCTIONS[int(e.function_stage)], "desc":"每次函数攻击后前进两档；每次损失生命后退一档，护盾吸收不退档。共10档。", "turns":-1, "debuff":false, "uncleansable":true}
+	e.statuses.exam_function = {"name":"函数 · " + FUNCTIONS[int(e.function_stage)], "desc":"每次函数攻击后前进两档；每次损失生命后退一档，护盾吸收不退档。共10档。", "turns":-1, "debuff":false, "uncleansable":true, "category":"passive"}
 
 static func describe_score(e: Dictionary) -> void:
-	e.statuses.score_rule = {"name":"分数 %d/100 · 待结算 +%d" % [e.score, e.score_pending], "desc":"所有正伤害最多结算1点，不能以伤害击败。每次命中计6分，原伤害每20点额外1分，最多额外4分；毒爆、反伤均计入。敌方回合开始加分，100分退场。本轮%d次命中。" % e.score_hits, "turns":-1, "debuff":false, "uncleansable":true}
+	e.statuses.score_rule = {"name":"分数 %d/100 · 待结算 +%d" % [e.score, e.score_pending], "desc":"所有正伤害最多结算1点，不能以伤害击败。每次命中计6分，原伤害每20点额外1分，最多额外4分；毒爆、反伤均计入。敌方回合开始加分，100分退场。本轮%d次命中。" % e.score_hits, "turns":-1, "debuff":false, "uncleansable":true, "category":"passive"}
 
 static func function_damage(e: Dictionary) -> int:
 	var x: int = roundi(7 + (int(e.level) - 1) * (0.35 if TowerRun.active else 0.5))
@@ -166,7 +167,7 @@ static func resolve(s: Node, index: int) -> bool:
 		"injection":
 			e.hp = mini(int(e.max_hp), int(e.hp) + roundi(float(e.max_hp) * 0.1))
 			for id in e.statuses.keys():
-				if bool(e.statuses[id].get("debuff", false)) and not bool(e.statuses[id].get("uncleansable", false)):
+				if STATUS.is_debuff(e.statuses[id]) and not bool(e.statuses[id].get("uncleansable", false)):
 					r.dispel(e, id)
 					break
 		"tendon":

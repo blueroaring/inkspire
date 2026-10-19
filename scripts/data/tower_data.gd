@@ -1,7 +1,7 @@
 class_name TowerData
 extends RefCounted
 ## The seed fixes ordinary formations for a save; milestones never depend on RNG.
-const VERSION := "tower-0.2.0"
+const VERSION := "tower-0.3.0"
 const GAME_TITLE := "高中异闻：尖塔"
 const LESSON_OBSERVATIONS := {
  "li_anya":["选择一张队友本局携带的低级非幻形牌。该牌归李安雅所有，由原角色执行；李安雅获得幻形护盾。", "观察施暴者标记与涅槃充能。每位队友每回合首次攻击标记目标可为李安雅充能1；打出幻形牌也能充能。"],

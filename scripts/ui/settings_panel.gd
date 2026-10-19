@@ -12,6 +12,7 @@ extends Control
 
 signal closed
 
+const MOBILE := preload("res://scripts/ui/tower_mobile.gd")
 const T := preload("res://scripts/ui/battle_theme.gd")
 const V := preload("res://scripts/ui/fc_card_visuals.gd")
 const ART := preload("res://scripts/ui/battle_archive_art.gd")
@@ -34,7 +35,7 @@ func _ready() -> void:
 	T.apply(self)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	if embedded:
-		_build_content(self, Vector2(1544, 600))
+		_build_content(self, size if MOBILE.enabled() and size.x > 0 else Vector2(1544, 600))
 		return
 	_dim = ColorRect.new()
 	_dim.color = Color(0.035, 0.045, 0.05, 0.36)
@@ -43,6 +44,7 @@ func _ready() -> void:
 	_center = Control.new()
 	_center.size = Vector2(1608, 860)
 	add_child(_center)
+	MOBILE.register_back(self, _on_close)
 	var frame := V.panel(_center, Rect2(0, 0, 1608, 860), T.INK, T.LINE, 6)
 	frame.get_node("SurfaceArt").ornate = false
 	var engraving := ART.new()
@@ -56,7 +58,7 @@ func _ready() -> void:
 	var close := Button.new()
 	close.text = "关闭  ×"
 	close.position = Vector2(1414, 26)
-	close.size = Vector2(154, 44)
+	close.size = Vector2(190, 96) if MOBILE.enabled() else Vector2(154, 44)
 	T.button(close, T.GOLD)
 	close.pressed.connect(_on_close)
 	frame.add_child(close)
@@ -72,6 +74,9 @@ func _ready() -> void:
 
 func _build_content(parent: Control, area: Vector2) -> void:
 	parent.size = area
+	if MOBILE.enabled():
+		_build_mobile_content(parent, area)
+		return
 	for column in 2:
 		var pane := V.panel(parent, Rect2(column * 784, 0, 760, area.y), T.SURFACE, Color(T.LINE, 0.5), 6)
 		pane.name = "SettingsColumn_%d" % column
@@ -100,6 +105,12 @@ func _relayout() -> void:
 	position = Vector2.ZERO
 	size = area
 	_dim.size = area
+	if MOBILE.enabled():
+		var safe := MOBILE.content_rect(get_viewport())
+		var scale_factor := minf(safe.size.x / 1640.0, safe.size.y / 900.0)
+		_center.scale = Vector2.ONE * scale_factor
+		_center.position = safe.position + (safe.size - Vector2(1608, 860) * scale_factor) * 0.5
+		return
 	var factor := minf(1.0, minf(area.x / 1680.0, area.y / 920.0))
 	_center.scale = Vector2.ONE * factor
 	_center.position = (area - Vector2(1608, 860) * factor) * 0.5
@@ -114,7 +125,7 @@ func _exit_tree() -> void:
 func _section(title: String) -> void:
 	var l := Label.new()
 	l.text = title
-	l.add_theme_font_size_override("font_size", 22)
+	l.add_theme_font_size_override("font_size", 40 if MOBILE.enabled() else 22)
 	l.add_theme_color_override("font_color", T.GOLD)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	l.add_theme_font_override("font", T.HEADING)
@@ -145,6 +156,11 @@ func _build_game() -> void:
 	_section("游戏")
 	_add_language_option()
 	_add_check("自动播放对话（AUTO，A 键切换）", "game", "auto_advance")
+	_build_privacy()
+
+func _build_privacy() -> void:
+	_section("隐私")
+	_add_check("分享匿名尖塔平衡数据", "privacy", "anonymous_tower_data", "通关第20层后，在退出或切到后台时自动向官网发送层数、阵容和最近战斗统计，仅作者后台可见，不参与排名。不会发送昵称、完整存档或文本记录。关闭会清除待发送数据；断网时下次启动重试。")
 
 
 func _build_battle() -> void:
@@ -153,7 +169,7 @@ func _build_battle() -> void:
 	_add_check("终结技演出（CG / 动画 / 语音）", "battle", "ultimate_presentation", "关闭后跳过终结技的CG、海报、动画和语音，直接结算技能；包括李安雅的变身与回归。")
 	_add_check("简易特效（统一敌我攻击表现）", "battle", "simple_effects", "所有敌我攻击统一使用简短的命中特效和音效。伤害、命中次数与技能效果照常结算；终结技演出由上方开关控制。")
 	_add_check("显示伤害数字", "battle", "show_damage_number", "显示敌我生命与护盾扣减的飘字。关闭后仍保留血条、状态提示和战斗记录。")
-	_add_check("指令二次确认", "battle", "confirm_commands", "默认关闭。开启后，出牌、终结技、道具及结束回合前确认；需要目标的指令在选好目标后确认。确认框出现时只能选择确认或取消，取消不会消耗资源。")
+	_add_check("指令二次确认", "battle", "touch_confirm_commands" if MOBILE.enabled() else "confirm_commands", ("触屏默认开启。" if MOBILE.enabled() else "默认关闭。") + "开启后，出牌、终结技、道具及结束回合前确认；需要目标的指令在选好目标后确认。确认框出现时只能选择确认或取消，取消不会消耗资源。")
 
 
 func _add_effect_speed_option() -> void:
@@ -162,12 +178,12 @@ func _add_effect_speed_option() -> void:
 	var label := Label.new()
 	label.text = "特效模式"
 	label.custom_minimum_size = Vector2(290, 0)
-	label.add_theme_font_size_override("font_size", 22)
+	label.add_theme_font_size_override("font_size", 40 if MOBILE.enabled() else 22)
 	label.add_theme_color_override("font_color", T.TEXT)
 	row.add_child(label)
 	var option := OptionButton.new()
 	option.name = "BattleEffectSpeed"
-	option.custom_minimum_size = Vector2(280, 40)
+	option.custom_minimum_size = Vector2(700, 144) if MOBILE.enabled() else Vector2(280, 40)
 	_style_option(option)
 	option.add_item("1倍速特效", 1)
 	option.add_item("2倍速特效", 2)
@@ -183,7 +199,7 @@ func _add_effect_speed_option() -> void:
 
 func _build_video() -> void:
 	_section("画面")
-	_add_check("全屏", "video", "fullscreen")
+	if not MOBILE.enabled(): _add_check("全屏", "video", "fullscreen")
 	_add_slider("震屏强度", "video", "screen_shake", 0.0, 2.0, 0.1)
 
 
@@ -197,7 +213,7 @@ func _add_slider(label_text: String, section: String, key: String,
 	var label := Label.new()
 	label.text = label_text
 	label.custom_minimum_size = Vector2(290, 0)
-	label.add_theme_font_size_override("font_size", 22)
+	label.add_theme_font_size_override("font_size", 40 if MOBILE.enabled() else 22)
 	label.add_theme_color_override("font_color", T.TEXT)
 	row.add_child(label)
 
@@ -207,13 +223,16 @@ func _add_slider(label_text: String, section: String, key: String,
 	slider.max_value = max_value
 	slider.step = step
 	slider.value = float(Settings.get_value(section, key, min_value))
-	slider.custom_minimum_size = Vector2(260, 36)
+	slider.custom_minimum_size = Vector2(780, 144) if MOBILE.enabled() else Vector2(260, 36)
 	slider.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(slider)
 
+	if MOBILE.enabled():
+		label.custom_minimum_size.x = 430
+		label.add_theme_font_size_override("font_size", 40)
 	var value_label := Label.new()
 	value_label.custom_minimum_size = Vector2(84, 0)
-	value_label.add_theme_font_size_override("font_size", 22)
+	value_label.add_theme_font_size_override("font_size", 40 if MOBILE.enabled() else 22)
 	value_label.add_theme_color_override("font_color", T.MUTED)
 	value_label.text = _format_value(slider.value)
 	row.add_child(value_label)
@@ -229,20 +248,31 @@ func _add_slider(label_text: String, section: String, key: String,
 
 
 func _add_check(label_text: String, section: String, key: String, description: String = "") -> void:
-	var check := CheckButton.new()
+	var check: BaseButton = Button.new() if MOBILE.enabled() else CheckButton.new()
+	check.toggle_mode = true
 	check.name = "Setting_" + section + "_" + key
-	check.custom_minimum_size.y = 38
+	check.custom_minimum_size.y = 144 if MOBILE.enabled() else 38
 	check.text = label_text
 	check.tooltip_text = description
-	check.button_pressed = bool(Settings.get_value(section, key, false))
-	check.add_theme_font_size_override("font_size", 22)
+	check.button_pressed = bool(Settings.get_value(section, key, key == "touch_confirm_commands"))
+	if MOBILE.enabled():
+		check.text = label_text + ("  · 已开启" if check.button_pressed else "  · 已关闭")
+		T.button(check, T.GOLD)
+	check.add_theme_font_size_override("font_size", 40 if MOBILE.enabled() else 22)
 	for state in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
 		check.add_theme_color_override(state, T.TEXT)
 	check.toggled.connect(func(pressed: bool) -> void:
+		if MOBILE.enabled(): check.text = label_text + ("  · 已开启" if pressed else "  · 已关闭")
 		Settings.set_value(section, key, pressed)
 		Settings.save_settings()
 	)
 	_rows.add_child(check)
+	if MOBILE.enabled() and not description.is_empty():
+		var help := Label.new()
+		help.text = description
+		help.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		help.add_theme_font_size_override("font_size", 36)
+		_rows.add_child(help)
 
 
 func _add_language_option() -> void:
@@ -252,7 +282,7 @@ func _add_language_option() -> void:
 	var label := Label.new()
 	label.text = "语言（预留）"
 	label.custom_minimum_size = Vector2(290, 0)
-	label.add_theme_font_size_override("font_size", 22)
+	label.add_theme_font_size_override("font_size", 40 if MOBILE.enabled() else 22)
 	label.add_theme_color_override("font_color", T.TEXT)
 	row.add_child(label)
 
@@ -273,7 +303,7 @@ func _add_language_option() -> void:
 
 
 func _style_option(option: OptionButton) -> void:
-	option.add_theme_font_size_override("font_size", 22)
+	option.add_theme_font_size_override("font_size", 40 if MOBILE.enabled() else 22)
 	for state in ["normal", "hover", "pressed", "focus"]:
 		option.add_theme_stylebox_override(state, T.frame(T.HOVER if state == "hover" else T.RECESSED, T.GOLD if state == "focus" else T.LINE, 1, 5))
 	for state in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
@@ -284,13 +314,17 @@ func _style_option(option: OptionButton) -> void:
 	popup.add_theme_color_override("font_color", T.TEXT)
 	popup.add_theme_color_override("font_hover_color", T.TEXT)
 	popup.add_theme_font_override("font", T.BODY)
-	popup.add_theme_font_size_override("font_size", 22)
+	popup.add_theme_font_size_override("font_size", 40 if MOBILE.enabled() else 22)
+	if MOBILE.enabled(): popup.add_theme_constant_override("v_separation", 26)
 
 
 func _style_slider(slider: HSlider) -> void:
 	var track := T.frame(T.RECESSED, T.LINE, 1, 3)
 	track.content_margin_top = 3
 	track.content_margin_bottom = 3
+	if MOBILE.enabled():
+		track.content_margin_top = 10
+		track.content_margin_bottom = 10
 	slider.add_theme_stylebox_override("slider", track)
 	for key in ["grabber_area", "grabber_area_highlight"]:
 		var fill := T.frame(T.GOLD, Color.TRANSPARENT, 0, 3)
@@ -310,3 +344,18 @@ func _on_close() -> void:
 	Settings.save_settings()
 	visible = false
 	closed.emit()
+
+func _build_mobile_content(parent: Control, area: Vector2) -> void:
+	_scroll = ScrollContainer.new()
+	_scroll.name = "MobileSettingsScroll"
+	_scroll.size = area
+	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	parent.add_child(_scroll)
+	_rows = VBoxContainer.new()
+	_rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_rows.add_theme_constant_override("separation", 20)
+	_scroll.add_child(_rows)
+	_build_battle()
+	_build_audio()
+	_build_video()
+	_build_privacy()

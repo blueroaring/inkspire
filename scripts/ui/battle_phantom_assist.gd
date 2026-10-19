@@ -24,8 +24,14 @@ func _ready() -> void:
 	z_index = 90
 	button = preload("res://scripts/ui/battle_phantom_assist_icon.gd").new()
 	button.position = Vector2(1760, 754)
-	button.pressed.connect(present)
+	button.pressed.connect(func():
+		if preload("res://scripts/ui/tower_mobile.gd").enabled() and bool(Settings.get_value("battle", "touch_confirm_commands", true)):
+			preload("res://scripts/ui/tower_mobile.gd").instance().show_help("援助技", button.tooltip_text, "确认释放", present)
+		else: present())
 	add_child(button)
+	if preload("res://scripts/ui/tower_mobile.gd").enabled():
+		button.scale = Vector2.ONE * 1.8
+		button.position = Vector2(1700, 702)
 	_update_button()
 
 func _process(delta: float) -> void:
@@ -70,6 +76,7 @@ func present() -> void:
 	cinematic.clip_contents = true
 	cinematic.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(cinematic)
+	preload("res://scripts/ui/tower_mobile.gd").register_back(cinematic, func(): dismiss = true)
 	var backdrop := ColorRect.new()
 	backdrop.color = Color("0b090f")
 	backdrop.size = size

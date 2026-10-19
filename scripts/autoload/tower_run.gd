@@ -23,9 +23,12 @@ var old_read_only := false
 var lesson_reading := false
 var _started_ms := 0
 var _report_integrity := "legacy"
+var telemetry: Node
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	telemetry = preload("res://scripts/tower/telemetry.gd").new()
+	add_child(telemetry)
 	FightSystem.player_action_started.connect(_action)
 	FightSystem.battle_lost.connect(func() -> void:
 		if active and not pending.is_empty(): FightSystem.last_reward = settle(false))
@@ -696,6 +699,7 @@ func save_game() -> bool:
 		if backup_error != OK: error = "存档备份失败。"; return false
 	var code := DirAccess.rename_absolute(path + ".tmp", path)
 	if code != OK: error = "存档替换失败：" + error_string(code); return false
+	if is_instance_valid(telemetry): telemetry.capture(data)
 	return true
 
 func read_save(selected_slot: int) -> Dictionary:

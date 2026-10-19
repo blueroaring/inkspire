@@ -1,4 +1,5 @@
 extends RefCounted
+const STATUS := preload("res://scripts/fight/status_rules.gd")
 ## Rooftop finale. All encounter state lives on units, including in preview copies.
 const BOSS := "terminal_echo"
 const SUMMONS := ["whisper_silhouette", "terminal_choir", "false_dawn"]
@@ -201,7 +202,7 @@ static func resolve(s: Node, index: int) -> bool:
 						stunned = stunned or u.statuses.has("stun")
 						if int(b.boss_phase) > 1:
 							for key in u.statuses.keys():
-								if not bool(u.statuses[key].get("debuff", false)) and not bool(u.statuses[key].get("uncleansable", false)): u.statuses.erase(key)
+								if STATUS.is_buff(u.statuses[key]) and not bool(u.statuses[key].get("uncleansable", false)): u.statuses.erase(key)
 					s.action_resolved.emit("ally", target)
 				if not s.battle_active: break
 			if int(b.boss_phase) == 3 and stunned:

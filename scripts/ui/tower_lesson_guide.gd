@@ -14,6 +14,14 @@ func _ready() -> void:
 	size = Vector2(1920, 1080)
 	mouse_filter = MOUSE_FILTER_IGNORE
 	z_index = 80
+	if preload("res://scripts/ui/tower_mobile.gd").enabled():
+		rail = M.button("教学手册", Rect2(520, 140, 360, 144), _show_step, T.GOLD)
+		rail.add_theme_font_size_override("font_size", 38)
+		add_child(rail)
+		task = Label.new()
+		task.hide()
+		add_child(task)
+		return
 	rail = M.panel(Rect2(532, 119, 1316, 91), T.SURFACE, T.GOLD)
 	add_child(rail)
 	task = M.paragraph(rail, "正在准备教学用的手牌…", Rect2(24, 12, 1050, 68), 21)
@@ -74,6 +82,11 @@ func _show_step() -> void:
 			words = "教学要求已经完成，接下来可以自由出牌了。\n\n留意敌人头顶的意图和队友剩余的生命。结束回合后，敌人会行动，之后你会抽到新的手牌。\n\n打赢就能过关。首次完成多人实战会获得这名角色的专武，去「角色 → 专武 / 遗物 → 角色专武」就能查看和装备。"
 	if preload("res://scripts/ui/tower_mobile.gd").enabled():
 		words = words.replace("左键点击", "点按").replace("右键可查看完整卡牌说明", "开启左下「详情」后点牌查看说明").replace("右键可以查看卡牌详情", "开启「详情」后点牌查看说明")
+	if preload("res://scripts/ui/tower_mobile.gd").enabled():
+		modal.queue_free()
+		modal = preload("res://scripts/ui/tower_mobile.gd").instance().show_help(title, words.replace("点击卡牌即可生效", "点牌并确认后即可生效"), caption, _advance_mobile)
+		modal.dismissed.connect(func(): modal = null; TowerRun.lesson_reading = false; FightSystem.state_changed.emit())
+		return
 	M.heading(box, title, Rect2(304, 32, 790, 54), 32)
 	M.paragraph(box, words, Rect2(304, 104, 780, 350), 24)
 	box.add_child(M.button(caption, Rect2(654, 488, 425, 58), func():
@@ -90,3 +103,8 @@ func _show_step() -> void:
 
 func _exit_tree() -> void:
 	TowerRun.lesson_reading = false
+
+func _advance_mobile() -> void:
+	if intro_page < 3:
+		intro_page += 1
+		_show_step.call_deferred()

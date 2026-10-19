@@ -23,6 +23,12 @@ static func effect_icons(parent: Node, card: Dictionary, position: Vector2, icon
 		badge.name = "Effect_" + key
 		badge.mouse_filter = Control.MOUSE_FILTER_PASS
 		badge.tooltip_text = "%s\n%s" % [data[0], data[1]]
+		if preload("res://scripts/ui/tower_mobile.gd").enabled():
+			badge.mouse_filter = Control.MOUSE_FILTER_STOP
+			badge.gui_input.connect(func(event: InputEvent):
+				if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+					preload("res://scripts/ui/tower_mobile.gd").instance().show_help(String(data[0]), String(data[1]))
+					badge.accept_event())
 		glyph(badge, key, Rect2(Vector2(1, 1), Vector2.ONE * (icon_size - 2)), data[2])
 		if with_name: text(badge, "木马" if key == "trojan" else "附魔", Rect2(icon_size, 0, 34, icon_size), 14, THEME.ON_STAGE, true)
 		offset += width + 5
@@ -56,7 +62,7 @@ static func style(bg: Color, border: Color, width: int = 1, radius: int = 16) ->
 
 static func text(parent: Node, words: String, rect: Rect2, font: int, color: Color = THEME.TEXT, centered: bool = false) -> Label:
 	var label := Label.new()
-	label.text = words
+	label.text = preload("res://scripts/ui/tower_mobile.gd").words(words)
 	label.add_theme_font_override("font", THEME.BODY)
 	label.position = rect.position
 	label.size = rect.size

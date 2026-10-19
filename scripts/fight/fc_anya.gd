@@ -1,4 +1,5 @@
 extends RefCounted
+const STATUS := preload("res://scripts/fight/status_rules.gd")
 ## Li Anya's cards retain physical ownership while borrowing the original actor.
 ## All mutable state lives on fc_rules so previews deep-copy the complete form.
 const ID := "li_anya"
@@ -36,7 +37,7 @@ static func mark_round(f: RefCounted) -> void:
 
 static func show_mark(f: RefCounted) -> void:
 	if f.anya_mark < 0 or f.anya_mark >= f.s.enemies.size() or not f.s._is_alive(f.s.enemies[f.anya_mark]): return
-	f.s.enemies[f.anya_mark].statuses.anya_abuser = {"name":"施暴者", "desc":"每位队友本回合首次对其造成攻击、毒爆或反伤，为李安雅增加1点涅槃充能。", "turns":-1, "debuff":false, "uncleansable":true}
+	f.s.enemies[f.anya_mark].statuses.anya_abuser = {"name":"施暴者", "desc":"每位队友本回合首次对其造成攻击、毒爆或反伤，为李安雅增加1点涅槃充能。", "turns":-1, "debuff":false, "uncleansable":true, "category":"mark", "persist_through_phase":true}
 
 static func gain_charge(f: RefCounted, amount: int) -> void:
 	var at := owner(f)
@@ -58,7 +59,7 @@ static func received_buffs(f: RefCounted, actor: int, before: Dictionary, borrow
 	if at < 0 or actor == at or borrowed or phoenix(f): return
 	for id in f.s.allies[at].statuses:
 		var value: Dictionary = f.s.allies[at].statuses[id]
-		if bool(value.get("debuff", false)) or id in ["poison_guard", "temporary_guard"]: continue
+		if not STATUS.is_buff(value) or id in ["poison_guard", "temporary_guard"]: continue
 		if value != before.get(id, {}):
 			gain_charge(f, 1)
 			return
@@ -200,7 +201,7 @@ static func _settle_leave(f: RefCounted, defeated: bool) -> void:
 			s.allies[i].downed = int(s.allies[i].hp) <= 0
 			s.allies[i].downed_round = s.round if s.allies[i].downed else -1
 		for id in s.allies[i].statuses.keys():
-			if bool(s.allies[i].statuses[id].get("debuff", false)): s.allies[i].statuses.erase(id)
+			if STATUS.is_debuff(s.allies[i].statuses[id]): s.allies[i].statuses.erase(id)
 		s.allies[i].marks.clear()
 	s.allies[at].ult = 3
 	s.draw_pile = snapshot.draw

@@ -15,6 +15,7 @@ const STEPS := [
 	{"page":"effects", "title":"机制说明：遇到陌生效果就来查", "text":"这里集中解释战斗规则与状态，按分类或关键词查找，并阅读详细说明。战斗里也能从角色与档案入口查看资料，但不能修改卡组和装备。\n周明远数学的头像可以左键或右键打开演算区；正为队友选择技能目标时，左键仍会完成选取。", "focus":Rect2(64, 180, 1792, 510)},
 	{"page":"loadout", "title":"准备完成，再去编队出战", "text":"右下「打开编队」返回尖塔选择队员与站位，周明远卡片上的「无极 / 数学」可直接切换形态。检查剩余生命、死亡状态，再开始战斗。\n技能、装备、怪物与道具资料会影响每场战斗；以后可随时从「角色系统与战斗百科」回来调整。", "focus":Rect2(1435, 942, 415, 60), "top":true},
 ]
+const MOBILE := preload("res://scripts/ui/tower_mobile.gd")
 var index := 0
 var replay := false
 
@@ -35,6 +36,9 @@ func show_step(value: int) -> void:
 		remove_child(child)
 		child.queue_free()
 	var step: Dictionary = STEPS[index]
+	if MOBILE.enabled():
+		_mobile_step(step)
+		return
 	var hole: Rect2 = step.focus
 	for rect in [Rect2(0, 0, 1920, hole.position.y), Rect2(0, hole.end.y, 1920, 1080 - hole.end.y), Rect2(0, hole.position.y, hole.position.x, hole.size.y), Rect2(hole.end.x, hole.position.y, 1920 - hole.end.x, hole.size.y)]:
 		var dim := ColorRect.new()
@@ -66,3 +70,43 @@ func _next() -> void:
 		TowerRun.save_game()
 	completed.emit()
 	queue_free()
+
+func _mobile_step(step: Dictionary) -> void:
+	MOBILE.register_back(self, func(): show_step(maxi(0, index - 1)))
+	var shade := ColorRect.new()
+	shade.size = size
+	shade.color = Color(0.01, 0.025, 0.045, 0.56)
+	add_child(shade)
+	var focus := Rect2(40, 180, 1820, 300) if step.page == "loadout" else Rect2(64, 180, 1792, 340)
+	if index == 8: focus = Rect2(1435, 942, 415, 96)
+	var border := M.panel(focus, Color.TRANSPARENT, T.GOLD)
+	add_child(border)
+	var pane := M.panel(Rect2(40, 40 if index == 8 else 540, 1840, 500), T.SURFACE, T.GOLD)
+	add_child(pane)
+	M.heading(pane, "功能教程 %d / %d · %s" % [index + 1, STEPS.size(), step.title], Rect2(40, 22, 1750, 64), 36)
+	var descriptions := {
+		0:"用上方角色选择框切换队员。角色系统可以调整技能与装备，也能查阅属性、怪物、道具和机制。首次进入需要看完操作介绍；以后可以点「功能教程」重看。",
+		1:"点「角色档案 / 被动」查看等级、生命、被动和终结技。用「头像」选择立绘风格。周明远可以用「形态」切换无极与数学；不同形态分别保存卡组和生命。李安雅可以打开双形态技能对照。",
+		2:"上下滑动技能列表，点「详情」查看效果；点 ＋ / − 调整数量。滑动经过按钮不会配卡。合法卡组自动保存；未满足张数或 cost 的调整会显示「尚未保存」，补齐或点「撤销调整」再离开。",
+		3:"用「角色与装备槽」「收藏与筛选」「物品详情与操作」三个分页查看装备。先选角色，再选物品阅读效果与限制，最后安装或卸下。各页可以上下滑动。",
+		7:"用搜索和分类查阅机制。战斗中开启「详情」后点卡牌或终结技可安全查看；点敌人意图或状态图标阅读说明。点周明远数学头像打开演算区，点其中的卡牌看详情，不会改变牌序。"
+	}
+	var scroll := ScrollContainer.new()
+	scroll.position = Vector2(40, 104)
+	scroll.size = Vector2(1750, 200)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	pane.add_child(scroll)
+	var body := Label.new()
+	body.text = MOBILE.words(descriptions.get(index, step.text))
+	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body.add_theme_font_size_override("font_size", 40)
+	scroll.add_child(body)
+	var previous := M.button("上一步", Rect2(40, 330, 400, 144), func(): show_step(index - 1))
+	previous.add_theme_font_size_override("font_size", 36)
+	previous.disabled = index == 0
+	pane.add_child(previous)
+	var next := M.button("了解了，开始准备" if index == STEPS.size() - 1 else "下一项", Rect2(1200, 330, 580, 144), _next, T.GOLD, true)
+	next.name = "CharacterGuideNext"
+	next.add_theme_font_size_override("font_size", 32)
+	pane.add_child(next)

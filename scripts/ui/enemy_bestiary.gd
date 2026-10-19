@@ -26,13 +26,14 @@ func _ready() -> void:
 	layout.add_theme_constant_override("separation", 24)
 	add_child(layout)
 	var sidebar := VBoxContainer.new()
-	sidebar.custom_minimum_size.x = 350
+	sidebar.custom_minimum_size.x = 560 if preload("res://scripts/ui/tower_mobile.gd").enabled() else 350
 	sidebar.add_theme_constant_override("separation", 12)
 	layout.add_child(sidebar)
 	_search = LineEdit.new()
 	_search.name = "BestiarySearch"
 	_search.placeholder_text = "搜索怪物、机制或推荐角色"
-	_search.custom_minimum_size.y = 46
+	_search.custom_minimum_size.y = 100 if preload("res://scripts/ui/tower_mobile.gd").enabled() else 46
+	if preload("res://scripts/ui/tower_mobile.gd").enabled(): _search.add_theme_font_size_override("font_size", 36)
 	_search.clear_button_enabled = true
 	sidebar.add_child(_search)
 	_count = _label("", 17, T.MUTED)
@@ -72,7 +73,7 @@ func _label(words: String, font_size: int = 20, color: Color = T.TEXT) -> Label:
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	label.add_theme_font_size_override("font_size", font_size)
+	label.add_theme_font_size_override("font_size", maxi(font_size, 36) if preload("res://scripts/ui/tower_mobile.gd").enabled() else font_size)
 	label.add_theme_color_override("font_color", color)
 	return label
 
@@ -103,11 +104,11 @@ func _filter(query: String) -> void:
 		if unlocked: V.icon(button, load(entry.portrait), Rect2(10, 12, 72, 76))
 		var title := _label(String(entry.name) if unlocked else "???", 20)
 		title.position = Vector2(94, 12)
-		title.size = Vector2(220, 51)
+		title.size = Vector2(440, 85) if preload("res://scripts/ui/tower_mobile.gd").enabled() else Vector2(220, 51)
 		title.max_lines_visible = 2
 		title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		button.add_child(title)
-		V.text(button, "%s · %s" % [entry.kind, FightData.attr_name(entry.attribute)] if unlocked else "???", Rect2(94, 68, 220, 24), 16, T.MUTED)
+		V.text(button, "%s · %s" % [entry.kind, FightData.attr_name(entry.attribute)] if unlocked else "???", Rect2(94, 112, 440, 32) if preload("res://scripts/ui/tower_mobile.gd").enabled() else Rect2(94, 68, 220, 24), 26 if preload("res://scripts/ui/tower_mobile.gd").enabled() else 16, T.MUTED)
 		button.pressed.connect(func() -> void: select_enemy(id))
 		_buttons[id] = button
 	_count.text = "%d / %d 种怪物 · 点击查看" % [matches.size(), DATA.ids().size()]
@@ -179,7 +180,7 @@ func _linked_text(words: String, font_size: int = 20, color: Color = T.TEXT) -> 
 	label.custom_minimum_size.x = 1
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	label.add_theme_font_override("normal_font", T.BODY)
-	label.add_theme_font_size_override("normal_font_size", font_size)
+	label.add_theme_font_size_override("normal_font_size", maxi(font_size, 36) if preload("res://scripts/ui/tower_mobile.gd").enabled() else font_size)
 	label.add_theme_color_override("default_color", color)
 	label.add_theme_constant_override("line_separation", 5)
 	label.meta_clicked.connect(_show_term)
@@ -207,6 +208,9 @@ func _linked_text(words: String, font_size: int = 20, color: Color = T.TEXT) -> 
 
 func _show_term(term_value: Variant) -> void:
 	var term := String(term_value)
+	if preload("res://scripts/ui/tower_mobile.gd").enabled() and _terms.has(term):
+		preload("res://scripts/ui/tower_mobile.gd").instance().show_help(term, String(_terms[term].get("desc", _terms[term].get("text", ""))))
+		return
 	if not _terms.has(term): return
 	_close_term()
 	var detail: Dictionary = _terms[term]

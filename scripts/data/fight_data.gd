@@ -175,10 +175,10 @@ static func statuses(unit: Dictionary) -> Array[Dictionary]:
 	if int(unit.get("guard", 0)) > 0:
 		out.append({"icon": "shield", "name": "常驻护盾", "desc": "个人常驻盾 %d；本场战斗跨回合保留，耗尽或被移除后消失。个人临时盾先于此盾抵挡伤害。" % unit["guard"], "debuff": false})
 	if bool(unit.get("dead", false)):
-		out.append({"icon": "dead", "name": "已退场", "desc": "该角色已经退出本场战斗。", "debuff": true})
+		out.append({"icon": "dead", "name": "已退场", "desc": "该角色已经退出本场战斗。", "debuff": true, "category": "role"})
 	elif bool(unit.get("downed", false)):
 		var downed_desc := "敌方回合开始时已濒死，且在该敌方回合受到生命伤害才会退场。" if String(unit.get("id", "")) == "zhoumingyuan" and String(unit.get("attribute", "none")) == "none" else "本回合不会退场；后续回合再次受到生命伤害会退场。"
-		out.append({"icon": "downed", "name": "濒死", "desc": downed_desc, "debuff": true})
+		out.append({"icon": "downed", "name": "濒死", "desc": downed_desc, "debuff": true, "category": "role"})
 	for id in (unit.get("statuses", {}) as Dictionary):
 		var status: Dictionary = unit["statuses"][id]
 		if id == "poison_guard":
@@ -189,13 +189,13 @@ static func statuses(unit: Dictionary) -> Array[Dictionary]:
 		var stacks := int(status.get("stacks", 0))
 		var stack_text := " · %d 层" % stacks if stacks > 1 else ""
 		if id == "poison": stack_text += " · 引爆计数 %d/5 · 达到最大生命10%%时触发毒性虚弱" % int(status.get("counter", 0))
-		out.append({"icon": String(id), "art_key":String(status.get("art_key", "")), "name": String(status.get("name", id)), "desc": String(status.get("desc", "")) + " " + duration_text + stack_text, "debuff": bool(status.get("debuff", true)), "turns":turns, "stacks":stacks})
+		out.append({"icon": String(id), "art_key":String(status.get("art_key", "")), "name": String(status.get("name", id)), "desc": String(status.get("desc", "")) + " " + duration_text + stack_text, "debuff": bool(status.get("debuff", true)), "category": String(status.get("category", "")), "turns":turns, "stacks":stacks})
 		if id == "poison":
-			out.append({"icon":"poison_counter", "name":"引爆计数", "desc":"当前 %d/5；达到5时引爆毒。技能直接引爆会清零；施毒与毒爆不计为攻击。" % int(status.get("counter", 0)), "debuff":false, "stacks":int(status.get("counter", 0)), "badge_text":"%d/5" % int(status.get("counter", 0))})
+			out.append({"icon":"poison_counter", "name":"引爆计数", "desc":"当前 %d/5；达到5时引爆毒。技能直接引爆会清零；施毒与毒爆不计为攻击。" % int(status.get("counter", 0)), "debuff":false, "category":"counter", "stacks":int(status.get("counter", 0)), "badge_text":"%d/5" % int(status.get("counter", 0))})
 	var marks: Dictionary = unit.get("marks", {})
 	var weakness: float = FightSystem.fc.POISON.weakness(FightSystem.fc, unit)
 	if weakness > 0:
-		out.append({"icon":"poison_weakness", "name":"毒性虚弱", "desc":"毒层数达到最大生命的10%%，造成的普通伤害降低%d%%。随毒层数变化，不是可单独净化的负面效果。" % roundi(weakness * 100), "debuff":false})
+		out.append({"icon":"poison_weakness", "name":"毒性虚弱", "desc":"毒层数达到最大生命的10%%，造成的普通伤害降低%d%%。随毒层数变化，不是可单独净化的负面效果。" % roundi(weakness * 100), "debuff":true, "category":"debuff"})
 	for attribute in marks:
 		out.append({"icon": String(attribute), "name": attr_name(String(attribute)) + "标记", "desc": "剩余 %d 回合；可被对应技能触发属性反应。" % int(marks[attribute]), "debuff": true})
 	return out

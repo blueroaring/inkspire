@@ -67,7 +67,7 @@ static func paragraph(parent: Node, words: String, rect: Rect2, font: int = 18, 
 	label.add_theme_font_override("font", T.BODY)
 	label.add_theme_font_size_override("font_size", font)
 	label.add_theme_color_override("font_color", color)
-	label.text = words
+	label.text = preload("res://scripts/ui/tower_mobile.gd").words(words)
 	parent.add_child(label)
 	return label
 

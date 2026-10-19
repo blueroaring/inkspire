@@ -1,7 +1,7 @@
 extends Control
 ## Card identity and flight state survive the battle HUD's frequent rebuilds.
 signal settled
-const CARD_SIZE := Vector2(420, 50)
+var card_size := Vector2(420, 50)
 const PILE_SCALE := Vector2(0.18, 0.46)
 const DRAW_TIME := 0.42
 const DISCARD_TIME := 0.38
@@ -32,6 +32,7 @@ func finish_confused(uid: int) -> void:
 	_confused_uids.erase(uid)
 
 func _ready() -> void:
+	if preload("res://scripts/ui/tower_mobile.gd").enabled(): card_size.y = 144
 	name = "BattleCardMotion"
 	z_index = 68
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -100,6 +101,13 @@ func observe_piles() -> void:
 		if _views.has(uid): _views[uid].hide()
 
 func _anchor(location: Dictionary) -> Vector2:
+	if preload("res://scripts/ui/tower_mobile.gd").enabled() and location.zone in ["hand", "resolving"]:
+		var uid := int(location.get("card", {}).get("uid", -1))
+		if _views.has(uid) and is_instance_valid(_views[uid]):
+			var view: Control = _views[uid]
+			var point := get_global_transform_with_canvas().affine_inverse() * (view.get_global_transform_with_canvas() * (view.size * 0.5))
+			return Vector2(point.x, clampf(point.y, 240, 700))
+		return Vector2(252, clampf(262 + int(location.index) * 162, 240, 700))
 	match String(location.zone):
 		"hand": return Vector2(252, 210 + int(location.index) * 57)
 		"resolving": return Vector2(292, 210 + int(location.index) * 57)
@@ -134,14 +142,14 @@ func _start(uid: int, source: Dictionary, dest: Dictionary, delay: float) -> voi
 	var start_rotation := -0.16 if source.zone == "deck" else 0.0
 	if _flights.has(uid):
 		ghost = _flights[uid].ghost
-		start = ghost.position + CARD_SIZE * 0.5
+		start = ghost.position + card_size * 0.5
 		start_scale = ghost.scale
 		start_rotation = ghost.rotation
 	else:
 		ghost = make_ticket.call(dest.card)
 		if ghost.get_parent() != null: ghost.get_parent().remove_child(ghost)
 		ghost.name = "CardFlight_%d" % uid
-		ghost.pivot_offset = CARD_SIZE * 0.5
+		ghost.pivot_offset = card_size * 0.5
 		_ignore_input(ghost)
 		add_child(ghost)
 	ghost.show()
@@ -160,7 +168,7 @@ func _start(uid: int, source: Dictionary, dest: Dictionary, delay: float) -> voi
 		"rotation":start_rotation, "age":-delay, "duration":DRAW_TIME + DRAW_DISCARD_HOLD + DISCARD_TIME if draw_discard else BURN_TIME if burning else 0.22 if shifting else DRAW_TIME if dest.zone == "hand" else DISCARD_TIME,
 		"shifting":shifting, "burn_overlay":burn_overlay, "draw_discard":draw_discard,
 		"reveal_at":_anchor({"zone":"hand", "index":FightSystem.hand.size()})}
-	ghost.position = start - CARD_SIZE * 0.5
+	ghost.position = start - card_size * 0.5
 	ghost.scale = start_scale
 	ghost.rotation = start_rotation
 	# Queued draws wait invisibly for the turn ribbon to leave.
@@ -201,7 +209,7 @@ func _process(delta: float) -> void:
 		else:
 			var eased := 1.0 - pow(1.0 - t, 3) if flight.zone == "hand" else t * t * (3.0 - 2.0 * t)
 			var arc := Vector2(48 if drawing else 62, -18) * sin(t * PI) if not flight.shifting else Vector2.ZERO
-			ghost.position = (flight.start as Vector2).lerp(flight.end, eased) + arc - CARD_SIZE * 0.5
+			ghost.position = (flight.start as Vector2).lerp(flight.end, eased) + arc - card_size * 0.5
 			ghost.scale = (flight.start_scale as Vector2).lerp(flight.end_scale, eased)
 			ghost.rotation = lerpf(float(flight.rotation), 0.0 if flight.zone == "hand" else 0.15, eased) + sin(t * PI) * (-0.08 if drawing else 0.10)
 			ghost.modulate.a = 1.0 if flight.zone == "hand" else 1.0 - smoothstep(0.72, 1.0, t) * (0.35 if flight.zone == "resolving" else 1.0)
@@ -223,7 +231,7 @@ func _animate_draw_discard(flight: Dictionary, ghost: Control) -> void:
 	var incoming := 1.0 - pow(1.0 - clampf(elapsed / DRAW_TIME, 0.0, 1.0), 3)
 	var outgoing := smoothstep(DRAW_TIME + DRAW_DISCARD_HOLD, float(flight.duration), elapsed)
 	var at := (flight.start as Vector2).lerp(flight.reveal_at, incoming).lerp(flight.end, outgoing)
-	ghost.position = at - CARD_SIZE * 0.5
+	ghost.position = at - card_size * 0.5
 	ghost.scale = (flight.start_scale as Vector2).lerp(Vector2.ONE, incoming).lerp(flight.end_scale, outgoing)
 	ghost.rotation = lerpf(float(flight.rotation), 0.0, incoming) + outgoing * 0.15
 	ghost.modulate.a = 1.0 - outgoing
@@ -244,7 +252,7 @@ func _animate_burn(flight: Dictionary, ghost: Control) -> void:
 	# Cards leaving a pile first expand below the toolbar, above the hand rows.
 	var focus: Vector2 = flight.start + Vector2(24, 0) if flight.from_zone in ["hand", "resolving"] else Vector2(292, 145)
 	var at: Vector2 = (flight.start as Vector2).lerp(focus, reveal).lerp(flight.end, collect)
-	ghost.position = at - CARD_SIZE * 0.5
+	ghost.position = at - card_size * 0.5
 	ghost.scale = (flight.start_scale as Vector2).lerp(Vector2.ONE, reveal).lerp(flight.end_scale, collect)
 	ghost.rotation = lerpf(float(flight.rotation), 0.0, reveal) + collect * 0.15
 	ghost.modulate.a = 1.0 - collect

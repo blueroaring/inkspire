@@ -48,6 +48,12 @@ func _ready() -> void:
 		group.add_theme_color_override("font_outline_color", Color("f6efdd"))
 		group.add_theme_constant_override("outline_size", 4)
 		_group_labels.append(group)
+	if preload("res://scripts/ui/tower_mobile.gd").enabled() and not compact:
+		for label in _labels:
+			label.get_parent().size = Vector2(240, 60)
+			label.size = Vector2(230, 60)
+			label.add_theme_font_size_override("font_size", 32)
+		for label in _group_labels: label.add_theme_font_size_override("font_size", 28)
 	resized.connect(_layout)
 	_layout()
 	set_canvas(colors, -1, {}, [], false)

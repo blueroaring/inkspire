@@ -29,7 +29,7 @@ static func cleanse_enemy(f: RefCounted, target: int, id: String = "poison") -> 
 		unit.hp = 0
 		f.s._add_log("成绩单的残影被净化，无法复生。", false)
 		return
-	if statuses.has(id) and bool(statuses[id].get("debuff", false)) and not bool(statuses[id].get("uncleansable", false)):
+	if statuses.has(id) and STATUS.is_debuff(statuses[id]) and not bool(statuses[id].get("uncleansable", false)):
 		statuses.erase(id)
 
 static func add(f: RefCounted, target: int, amount: int) -> void:
@@ -149,7 +149,7 @@ static func execute(f: RefCounted, c: Dictionary) -> void:
 			for i in s.enemies.size():
 				if f.damage_interrupted(c.damage_phases): break
 				advance(f, i, 3)
-			f.COMPANIONS.timed(f, o, "offstage", 1, {"name":"离场", "desc":"本回合免疫伤害且不被敌人锁定；无法直接释放技能或终结技。"})
+			f.COMPANIONS.timed(f, o, "offstage", 1, {"name":"离场", "desc":"本回合免疫伤害且不被敌人锁定；无法直接释放技能或终结技。", "category":"special"})
 		"D07":
 			if debuff(s.enemies[t], "grudge", {"name":"记仇", "desc":"本回合每受到一段攻击，在毒引爆后获得1层毒。", "turns":1}):
 				s.effect_requested.emit("D07", "enemy", t, 0, 0)

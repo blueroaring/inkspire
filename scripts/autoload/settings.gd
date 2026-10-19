@@ -26,6 +26,7 @@ func _ready() -> void:
 ## 全部默认值。新增设置项写这里。
 func _defaults() -> Dictionary:
 	return {
+		"privacy": {"anonymous_tower_data": true},
 		"audio": {
 			"master_volume": 1.0,
 			"music_volume": 0.8,
@@ -157,6 +158,7 @@ func apply_section(section: String) -> void:
 
 
 func _apply_video() -> void:
+	if (OS.has_feature("tower_release") or preload("res://scripts/ui/tower_mobile.gd").enabled()) and (OS.has_feature("android") or OS.has_feature("web")): return
 	var want_fullscreen: bool = bool(_config.get_value("video", "fullscreen", false))
 	var mode := DisplayServer.WINDOW_MODE_FULLSCREEN if want_fullscreen else DisplayServer.WINDOW_MODE_WINDOWED
 	if DisplayServer.window_get_mode() != mode:

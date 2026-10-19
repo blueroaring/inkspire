@@ -1,6 +1,7 @@
 extends Node2D
 ## 角色系统：查看永久成长，并在战斗外编辑当前角色的技能槽。
 
+const MOBILE := preload("res://scripts/ui/tower_mobile.gd")
 const SCREEN := Vector2(1920, 1080)
 const PRESENTATION := preload("res://scripts/data/battle_presentation.gd")
 const TUTORIAL_DIALOG := preload("res://scripts/ui/battle_tutorial_dialog.gd")
@@ -24,10 +25,12 @@ var selected_hero := ""
 var _error_label: Label
 var _tutorial_dialog: BattleTutorialDialog
 var _spotlight
+var _mobile_scroll := 0
 var _drafts: Dictionary = {}
 var _system_guide: Control
 
 func _ready() -> void:
+	MOBILE.ensure(get_tree())
 	if selected_hero != "":
 		_selected = selected_hero
 	if FightSystem.battle_active and not as_overlay:
@@ -142,6 +145,10 @@ func _build_base() -> void:
 	if TowerRun.active and not read_only:
 		var guide := M.button("功能教程", Rect2(596, 58, 170, 48), func(): _show_system_guide(true))
 		guide.name = "CharacterGuideReplay"
+		if MOBILE.enabled():
+			guide.position = Vector2(38, 922)
+			guide.size = Vector2(300, 136)
+			guide.add_theme_font_size_override("font_size", 34)
 		_ui.add_child(guide)
 	var pages := {"loadout":"角色与卡组", "equipment":"专武 / 遗物", "attributes":"属性克制", "bestiary":"怪物图鉴", "items":"战斗道具", "effects":"机制说明"}
 	var i := 0
@@ -149,6 +156,10 @@ func _build_base() -> void:
 		var tab := M.button(pages[key], Rect2(790 + i * 176, 58, 164, 48), func() -> void: _show_page(key))
 		tab.name = "CharacterTab_" + key
 		tab.disabled = _in_tutorial() and key != "loadout"
+		if MOBILE.enabled():
+			tab.position = Vector2(38 + i * 306, 20)
+			tab.size = Vector2(294, 144)
+			tab.add_theme_font_size_override("font_size", 34)
 		_ui.add_child(tab)
 		_tabs[key] = tab
 		i += 1
@@ -164,6 +175,9 @@ func _show_page(key: String) -> void:
 	_rebuild()
 
 func _rebuild() -> void:
+	if MOBILE.enabled() and is_instance_valid(_content):
+		var previous := _content.find_child("SkillCatalog", true, false) as ScrollContainer
+		if previous != null: _mobile_scroll = previous.scroll_vertical
 	if not is_instance_valid(_content): return
 	if is_instance_valid(_skill_popup):
 		_skill_popup.queue_free()
@@ -174,26 +188,29 @@ func _rebuild() -> void:
 	_error_label = null
 	for key in _tabs: T.button(_tabs[key], T.GOLD, key == _page)
 	if _page == "loadout":
-		var roster: Array = FightSystem.roster()
-		if read_only:
-			roster.clear()
-			for ally in FightSystem.allies: roster.append(String(ally.id))
-		if roster.is_empty(): return
-		if not roster.has(_selected): _selected = String(roster[0])
-		V.text(_content, "角色档案  /  %02d" % roster.size(), Rect2(68, 169, 280, 28), 18, T.MUTED)
-		var scroll := ScrollContainer.new()
-		scroll.name = "CharacterRoster"
-		_place(scroll, Rect2(64, 211, 290, 690))
-		scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-		_content.add_child(scroll)
-		var rows := VBoxContainer.new()
-		rows.add_theme_constant_override("separation", 10)
-		scroll.add_child(rows)
-		for id in roster:
-			var tile := M.hero_button(id, Rect2(0, 0, 270, 90), func() -> void: _select_hero(id), id == _selected, true)
-			tile.custom_minimum_size = Vector2(270, 90)
-			rows.add_child(tile)
-		_draw_detail(FightData.hero(_selected))
+		if MOBILE.enabled():
+			_draw_mobile_loadout()
+		else:
+			var roster: Array = FightSystem.roster()
+			if read_only:
+				roster.clear()
+				for ally in FightSystem.allies: roster.append(String(ally.id))
+			if roster.is_empty(): return
+			if not roster.has(_selected): _selected = String(roster[0])
+			V.text(_content, "角色档案  /  %02d" % roster.size(), Rect2(68, 169, 280, 28), 18, T.MUTED)
+			var scroll := ScrollContainer.new()
+			scroll.name = "CharacterRoster"
+			_place(scroll, Rect2(64, 211, 290, 690))
+			scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+			_content.add_child(scroll)
+			var rows := VBoxContainer.new()
+			rows.add_theme_constant_override("separation", 10)
+			scroll.add_child(rows)
+			for id in roster:
+				var tile := M.hero_button(id, Rect2(0, 0, 270, 90), func() -> void: _select_hero(id), id == _selected, true)
+				tile.custom_minimum_size = Vector2(270, 90)
+				rows.add_child(tile)
+			_draw_detail(FightData.hero(_selected))
 	elif _page == "equipment":
 		var equipment := EQUIPMENT_PANEL.new()
 		equipment.hero_id = _selected
@@ -220,6 +237,14 @@ func _rebuild() -> void:
 		var back := _button("返回尖塔" if TowerRun.active else "返回地图" if as_overlay else ("返回教学" if FightSystem.can_start_tutorial_battle() else "返回标题"), Vector2(1694, 942), Vector2(156, 60), _return_from_menu, T.GOLD, 20)
 		back.disabled = _in_tutorial()
 		_content.add_child(back)
+	if MOBILE.enabled():
+		for child in _content.get_children():
+			if child is Button and child.position.y >= 940:
+				child.position.y = 922
+				child.size.y = 136
+				child.add_theme_font_size_override("font_size", 34)
+			elif child is Label and child.position.y >= 950: child.hide()
+		MOBILE.register_back(self, _mobile_back)
 	_update_tutorial_focus.call_deferred()
 
 func _draw_detail(profile: Dictionary) -> void:
@@ -387,6 +412,9 @@ func _inspect_skill(id: String) -> void:
 	if _in_tutorial(): _advance_tutorial("open_formation")
 
 func _show_skill_popup(def: Dictionary) -> void:
+	if MOBILE.enabled():
+		MOBILE.instance().show_help(String(def.get("name", "技能")), "%s\n\n属性：%s　目标：%s\n能量：%s　携带 cost：%d" % [def.get("desc", ""), FightData.attr_name(String(def.get("attribute", FightData.ATTR_NONE))), FightData.target_name(String(def.get("target", "enemy"))), str(def.get("cost", 0)), int(def.get("skill_points", 1))])
+		return
 	if is_instance_valid(_skill_popup):
 		_skill_popup.queue_free()
 	_skill_popup = PanelContainer.new()
@@ -443,6 +471,9 @@ func _input(event: InputEvent) -> void:
 			_return_from_menu()
 
 func _show_error(message: String) -> void:
+	if MOBILE.enabled():
+		MOBILE.instance().show_help("卡组调整", message)
+		return
 	if message.is_empty():
 		return
 	if _error_label != null and is_instance_valid(_error_label):
@@ -570,3 +601,141 @@ func _has_pending_draft() -> bool:
 	_rebuild()
 	_show_error("请补齐卡组并满足携带 cost，或点击「撤销调整」后离开。")
 	return true
+
+func _draw_mobile_loadout() -> void:
+	var roster: Array = FightSystem.roster()
+	if read_only: roster = FightSystem.allies.map(func(unit: Dictionary): return String(unit.id))
+	if roster.is_empty(): return
+	if not roster.has(_selected): _selected = String(roster[0])
+	var picker := OptionButton.new()
+	picker.name = "MobileHeroPicker"
+	picker.position = Vector2(40, 180)
+	picker.size = Vector2(490, 144)
+	picker.add_theme_font_size_override("font_size", 34)
+	picker.get_popup().add_theme_font_size_override("font_size", 34)
+	picker.get_popup().add_theme_constant_override("v_separation", 26)
+	for id in roster: picker.add_item(String(FightData.hero(id).name))
+	picker.select(roster.find(_selected))
+	picker.item_selected.connect(func(index: int): _select_hero(String(roster[index])))
+	_content.add_child(picker)
+	var attribute := FightSystem.current_attribute(_selected)
+	var profile := FightData.hero(_selected)
+	var ultimate := FightData.ultimate(_selected, attribute)
+	var info := M.button("角色档案 / 被动", Rect2(550, 180, 400, 144), func():
+		MOBILE.instance().show_help(String(profile.name), "Lv.%d  ·  %s  ·  生命上限 %d\n\n角色被动\n%s\n\n终结技：%s\n%s" % [FightProgression.hero_level(_selected), FightData.attr_name(attribute), FightSystem.hero_max_hp(_selected), FightData.passive(_selected, attribute), ultimate.name, ultimate.desc]))
+	info.add_theme_font_size_override("font_size", 30)
+	_content.add_child(info)
+	var style := OptionButton.new()
+	style.position = Vector2(970, 180)
+	style.size = Vector2(390, 144)
+	style.add_item("头像：原画")
+	style.add_item("头像：早期像素")
+	style.select(1 if Settings.portrait_style(_selected) == "retro_pixel" else 0)
+	style.add_theme_font_size_override("font_size", 28)
+	style.get_popup().add_theme_font_size_override("font_size", 30)
+	style.get_popup().add_theme_constant_override("v_separation", 26)
+	style.item_selected.connect(func(index: int): Settings.set_portrait_style(_selected, "original" if index == 0 else "retro_pixel"); Settings.save_settings())
+	_content.add_child(style)
+	if _selected == "zhoumingyuan":
+		var forms: Array = FightSystem.unlocked_attributes()
+		var form := OptionButton.new()
+		form.name = "MobileCharacterForm"
+		form.position = Vector2(1380, 180)
+		form.size = Vector2(480, 144)
+		form.add_theme_font_size_override("font_size", 30)
+		form.get_popup().add_theme_font_size_override("font_size", 32)
+		form.get_popup().add_theme_constant_override("v_separation", 26)
+		for entry in forms: form.add_item("形态：" + FightData.attr_name(entry))
+		form.select(forms.find(attribute))
+		form.disabled = read_only
+		form.item_selected.connect(func(index: int):
+			if _drafts.has(_selected): MOBILE.instance().show_help("卡组尚未保存", "请先配齐卡组或撤销调整，再切换形态。"); form.select(forms.find(attribute)); return
+			FightSystem.set_attribute(_selected, String(forms[index])); _rebuild())
+		_content.add_child(form)
+	elif _selected == "li_anya":
+		_content.add_child(M.button("查看双形态", Rect2(1380, 180, 480, 144), func(): _ui.add_child(preload("res://scripts/ui/anya_form_reference.gd").new())))
+	var loadout := _working_loadout()
+	var limit := FightSystem.skill_point_limit(_selected)
+	V.text(_content, "携带 cost %d / %d  ·  卡组 %d / 至少 %d 张" % [FightSystem.loadout_points(loadout), limit, loadout.size(), FightSystem.initial_deck_size(_selected)], Rect2(45, 332, 1310, 54), 30, T.GOLD)
+	if _drafts.has(_selected):
+		V.text(_content, "尚未保存：" + FightSystem.loadout_error(_selected, loadout), Rect2(45, 390, 1310, 54), 26, T.RED)
+		_content.add_child(M.button("撤销调整", Rect2(1400, 332, 460, 112), func(): _drafts.erase(_selected); _rebuild(), T.RED))
+	var scroll := ScrollContainer.new()
+	scroll.name = "SkillCatalog"
+	scroll.position = Vector2(40, 460)
+	scroll.size = Vector2(1820, 440)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_content.add_child(scroll)
+	scroll.set_deferred("scroll_vertical", _mobile_scroll)
+	var rows := VBoxContainer.new()
+	rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	rows.add_theme_constant_override("separation", 18)
+	scroll.add_child(rows)
+	var group := ""
+	for skill in FightData.skills_for(_selected, attribute):
+		var id := String(skill)
+		var next_group := "数学技能" if id.begins_with("M") else "通用技能"
+		if next_group != group:
+			group = next_group
+			var heading := Label.new()
+			heading.text = group
+			heading.add_theme_font_size_override("font_size", 30)
+			rows.add_child(heading)
+		var def := FightData.skill(id)
+		var count := loadout.count(id)
+		var available := FightSystem.skill_available(_selected, id)
+		var row := PanelContainer.new()
+		row.name = "Skill_" + id
+		row.custom_minimum_size = Vector2(0, 160)
+		row.add_theme_stylebox_override("panel", T.frame(T.SURFACE, T.GOLD if count else T.LINE, 1, 6))
+		rows.add_child(row)
+		var margin := MarginContainer.new()
+		for edge in ["left", "right", "top", "bottom"]: margin.add_theme_constant_override("margin_" + edge, 20)
+		row.add_child(margin)
+		var line := HBoxContainer.new()
+		line.add_theme_constant_override("separation", 24)
+		margin.add_child(line)
+		var art := TextureRect.new()
+		art.texture = FightData.skill_icon(id)
+		art.custom_minimum_size = Vector2(144, 144)
+		art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		art.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		line.add_child(art)
+		var words := VBoxContainer.new()
+		words.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		line.add_child(words)
+		var title := Label.new()
+		title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		title.text = String(def.name)
+		title.add_theme_font_size_override("font_size", 34)
+		words.add_child(title)
+		var description := Label.new()
+		description.text = "%s · 携带 %d · 能量 %s%s" % [FightData.rarity_name(id), FightData.skill_points(id), "X" if int(def.get("cost", 0)) < 0 else str(def.get("cost", 0)), "" if available else " · Lv.%d 解锁" % FightData.unlock_level(id)]
+		description.add_theme_font_size_override("font_size", 26)
+		words.add_child(description)
+		for change in [-1, 1]:
+			var button := M.button("−" if change < 0 else "＋", Rect2(), func(): _change_count(id, change))
+			button.name = "RemoveCopy" if change < 0 else "AddCopy"
+			button.custom_minimum_size = Vector2(144, 144)
+			button.add_theme_font_size_override("font_size", 40)
+			button.disabled = read_only or not available or (count <= 0 if change < 0 else count >= FightData.copies(id))
+			line.add_child(button)
+			if change < 0:
+				var copies := Label.new()
+				copies.text = "%d / %d" % [count, FightData.copies(id)]
+				copies.custom_minimum_size.x = 110
+				copies.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+				copies.add_theme_font_size_override("font_size", 32)
+				line.add_child(copies)
+		var detail := M.button("详情", Rect2(), func(): _inspect_skill(id))
+		detail.name = "MobileSkillDetail"
+		detail.custom_minimum_size = Vector2(220, 144)
+		detail.add_theme_font_size_override("font_size", 32)
+		line.add_child(detail)
+
+func _mobile_back() -> void:
+	if is_instance_valid(_system_guide):
+		_system_guide.show_step(maxi(0, _system_guide.index - 1))
+	elif read_only: _close_overlay()
+	else: _return_from_menu()

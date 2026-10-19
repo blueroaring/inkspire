@@ -6,6 +6,7 @@ var _painting_popup: Control
 var _painting_sequence: Control
 var _calculation_popup: Control
 var _fc_card_detail: Control
+var _mobile_hand_scroll := 0
 var _mobile_inspect := false
 var _mobile_inspect_button: Button
 var _mobile_cancel_button: Button
@@ -15,6 +16,7 @@ const DISPLAY_FONT := preload("res://assets/fonts/noto_serif_sc/battle_ui.tres")
 var _round_label: Label
 var _energy_skin: Control
 const BATTLE_THEME := preload("res://scripts/ui/battle_theme.gd")
+const STATUS_RULES := preload("res://scripts/fight/status_rules.gd")
 const ATTRIBUTE_HINT := preload("res://scripts/ui/battle_attribute_hint.gd")
 const PERSONAL_GUARD := preload("res://scripts/ui/battle_personal_guard.gd")
 var _status_list: Control
@@ -146,6 +148,7 @@ var _ally_exits: Dictionary = {}
 const ICON_DIR := "res://assets/graphics/battle/icons/"
 const TUTORIAL_DIALOG := preload("res://scripts/ui/battle_tutorial_dialog.gd")
 const TUTORIAL_SPOTLIGHT := preload("res://scripts/ui/battle_tutorial_spotlight.gd")
+const MOBILE := preload("res://scripts/ui/tower_mobile.gd")
 const SCREEN := Vector2(1920, 1080)
 const ALLY_Y := 868.0
 const ALLY_WIDTH := 356.0
@@ -153,6 +156,7 @@ const ALLY_STEP := 380.0
 const ALLY_LEFT := 524.0
 
 func _ready() -> void:
+	preload("res://scripts/ui/tower_mobile.gd").ensure(get_tree())
 	if not FightSystem.battle_active:
 		FightSystem.begin_encounter(["paper_large", "paper_large"], [], [], false, false, "", true)
 	var presentation := PRESENTATION.for_encounter(FightSystem.encounter_serial, FightSystem.return_location, FightSystem.active_story_encounter)
@@ -290,7 +294,7 @@ func _build_base() -> void:
 	_settings_button = _compact_button("设置", Rect2(1358, 27, 98, 44), _open_battle_settings, BATTLE_THEME.GOLD)
 	_settings_button.name = "BattleSettingsButton"
 	_settings_button.tooltip_text = "打开战斗手札 · 设置"
-	_log_button = _compact_button("记录", Rect2(1468, 30, 84, 38), _toggle_log_popup)
+	_log_button = _compact_button("状态" if MOBILE.enabled() else "记录", Rect2(1468, 30, 84, 38), _mobile_statuses if MOBILE.enabled() else _toggle_log_popup)
 	_log_button.name = "BattleLogButton"
 	_character_button = _compact_button("角色", Rect2(1564, 30, 84, 38), _open_read_only_characters)
 	_item_button = _compact_button("道具", Rect2(1660, 30, 84, 38), _toggle_items)
@@ -311,8 +315,28 @@ func _build_base() -> void:
 			_clear_drag_visual()
 			FightSystem.cancel_targeting())
 		_mobile_cancel_button.name = "MobileCancelTarget"
-		for top_button in [_settings_button, _log_button, _character_button, _item_button, _leave_button]:
-			top_button.size.y = 58
+		for i in 5:
+			var top_button: Button = [_settings_button, _log_button, _character_button, _item_button, _leave_button][i]
+			top_button.position = Vector2(820 + i * 214, 12)
+			top_button.size = Vector2(200, 132)
+			top_button.get_node("BattleChrome").size = top_button.size
+			top_button.add_theme_font_size_override("font_size", 34)
+		_mobile_inspect_button.position.y = 770
+		_mobile_inspect_button.size.y = 144
+		_mobile_inspect_button.add_theme_font_size_override("font_size", 36)
+		_mobile_inspect_button.get_node("BattleChrome").size = _mobile_inspect_button.size
+		_mobile_cancel_button.position.y = 770
+		_mobile_cancel_button.size.y = 144
+		_mobile_cancel_button.add_theme_font_size_override("font_size", 34)
+		_mobile_cancel_button.get_node("BattleChrome").size = _mobile_cancel_button.size
+		_end_button.position = Vector2(42, 922)
+		_end_button.size = Vector2(420, 128)
+		_end_button.get_node("BattleChrome").size = _end_button.size
+		_end_button.add_theme_font_size_override("font_size", 36)
+		_round_label.position = Vector2(480, 108)
+		_round_label.size = Vector2(320, 60)
+		_round_label.add_theme_font_size_override("font_size", 32)
+		MOBILE.register_back(self, _mobile_back)
 
 func _open_battle_settings() -> void:
 	_clear_drag_visual()
@@ -415,6 +439,9 @@ func _refresh() -> void:
 	if is_instance_valid(_status_popup):
 		_status_popup.queue_free()
 		_status_popup = null
+	if MOBILE.enabled():
+		var previous := _ui.get_node_or_null("MobileHandScroll") as ScrollContainer
+		if previous != null: _mobile_hand_scroll = previous.scroll_vertical
 	for node in _dynamic.duplicate():
 		if is_instance_valid(node):
 			if node.get_parent() != null: node.get_parent().remove_child(node)
@@ -435,6 +462,7 @@ func _refresh() -> void:
 	_draw_painting()
 	var exhaust := _compact_button("消耗 %d" % FightSystem.fc.exhausted.size(), Rect2(572, 30, 104, 38), func() -> void: _show_fc_pile("exhausted"), Color("bb9cb8"))
 	exhaust.name = "ExhaustedPile"
+	if MOBILE.enabled(): exhaust.hide()
 	exhaust.tooltip_text = "点击查看消耗区"
 	_dynamic.append(exhaust)
 	if _header_ap:
@@ -960,7 +988,7 @@ func _draw_allies() -> void:
 			var math_hitbox := Control.new()
 			math_hitbox.name = "MathPortraitInspect"
 			math_hitbox.mouse_filter = Control.MOUSE_FILTER_STOP
-			math_hitbox.tooltip_text = "点击头像查看演算区与战斗计数（也支持右键）；选取队友目标时优先施放技能"
+			math_hitbox.tooltip_text = preload("res://scripts/ui/tower_mobile.gd").words("点击头像查看演算区与战斗计数（也支持右键）；选取队友目标时优先施放技能")
 			_ui.add_child(math_hitbox)
 			_place(math_hitbox, portrait_rect)
 			math_hitbox.gui_input.connect(func(event: InputEvent) -> void:
@@ -1104,6 +1132,7 @@ func _draw_party_guard(rect: Rect2, amount: int, temporary: bool, badge_offset: 
 	FC_VISUALS.text(badge, str(amount), Rect2(90, 1, 98, 34), 22, CHROME.INK, true)
 
 func _make_hand_ticket(data: Dictionary, index: int = -1) -> Button:
+	if MOBILE.enabled(): return _mobile_hand_ticket(data, index)
 	var id := String(data.skill_id)
 	var card := _button("", Vector2.ZERO, Vector2(420, 50), func() -> void: pass, FightData.rarity_color(id), 17)
 	for state in ["normal", "hover", "pressed", "disabled", "focus"]:
@@ -1136,6 +1165,19 @@ func _make_hand_ticket(data: Dictionary, index: int = -1) -> Button:
 func _draw_hand() -> void:
 	var cards: Array = FightSystem.get_hand()
 	var card_views: Array[Control] = []
+	var mobile_rows: VBoxContainer
+	if MOBILE.enabled():
+		var scroll := ScrollContainer.new()
+		scroll.name = "MobileHandScroll"
+		scroll.position = Vector2(42, 190)
+		scroll.size = Vector2(440, 560)
+		scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		_ui.add_child(scroll)
+		_dynamic.append(scroll)
+		mobile_rows = VBoxContainer.new()
+		mobile_rows.add_theme_constant_override("separation", 18)
+		scroll.add_child(mobile_rows)
+		scroll.set_deferred("scroll_vertical", _mobile_hand_scroll)
 	if cards.any(func(entry: Dictionary) -> bool: return bool(entry.get("trojan", false))):
 		var notice := FC_VISUALS.panel(_ui, Rect2(42, 149, 420, 29), Color("442633"), Color("e48791"), 4)
 		notice.name = "TrojanHandNotice"
@@ -1148,8 +1190,11 @@ func _draw_hand() -> void:
 		var caster := FightData.card_owner(data)
 		var card := _make_hand_ticket(data, i)
 		card.position = Vector2(42, 185 + i * 57)
+		if mobile_rows != null:
+			card.reparent(mobile_rows, false)
+			card.custom_minimum_size = Vector2(420, 144)
 		card.name = "HandCard_%d" % int(data.uid)
-		card.tooltip_text = "%s · 施术者：%s\n悬停预览最终扣血；左键施放，右键详情" % [FightData.rarity_name(id), caster.get("name", "")]
+		card.tooltip_text = preload("res://scripts/ui/tower_mobile.gd").words("%s · 施术者：%s\n悬停预览最终扣血；左键施放，右键详情" % [FightData.rarity_name(id), caster.get("name", "")])
 		if bool(data.get("trojan", false)): card.tooltip_text += "\n木马感染：必须先打出此牌，消耗能量，但原技能效果失效。"
 		elif cards.any(func(entry: Dictionary) -> bool: return bool(entry.get("trojan", false))): card.tooltip_text += "\n需先打出带木马标记的手牌。"
 		if FightSystem.ENEMY_RULES.slot_blocked(FightSystem, i): card.tooltip_text += "\n黑暗遮蔽：第%d位无法直接出牌，可交换、弃置或消耗。" % (i + 1)
@@ -1168,7 +1213,7 @@ func _draw_hand() -> void:
 						_request_card(i)
 						return
 					if not FightSystem.can_play(i): return
-					_drag_origin = Vector2(250, 210 + i * 57)
+					_drag_origin = _ui.get_global_transform_with_canvas().affine_inverse() * (card.get_global_transform_with_canvas() * (card.size * 0.5))
 					_pointer = _ui.get_global_transform_with_canvas().affine_inverse() * (card.get_global_transform_with_canvas() * event.position)
 					_press_pointer = _pointer
 					_drag_distance = 0.0
@@ -1186,6 +1231,7 @@ func _draw_hand() -> void:
 	_card_motion.sync_hand(cards, card_views)
 
 func _draw_dark_slots() -> void:
+	if MOBILE.enabled(): return
 	var slots: Dictionary = _enemy_display_dark_slots if _enemy_damage_staged else FightSystem.dark_slots
 	for key in slots.keys():
 		var index := int(key)
@@ -2336,7 +2382,7 @@ func _show_unit_status_gains(before: Dictionary, after: Dictionary, side: String
 		if marks != old_marks: _audio.play_sfx("sfx_xu_mark_gain" if marks > old_marks else "sfx_xu_mark_consume", 180)
 		if FightSystem.phase == FightSystem.PLAYER_TURN and FightSystem.resolving_action:
 			for id in old:
-				if bool(old[id].get("debuff", false)) and not current.has(id):
+				if STATUS_RULES.is_debuff(old[id]) and not current.has(id):
 					_audio.play_sfx("sfx_alyina_cleanse", 180)
 					break
 	if side == "enemy" and is_instance_valid(_audio):
@@ -2352,9 +2398,9 @@ func _show_unit_status_gains(before: Dictionary, after: Dictionary, side: String
 		if not previous.is_empty() and added_layers <= 0 and not refreshed: continue
 		var name := String(status.get("name", id))
 		var words := "%s +%d层" % [name, added_layers] if added_layers > 0 else name
-		var debuff := bool(status.get("debuff", false))
+		var debuff := STATUS_RULES.is_debuff(status)
 		var center := area.get_center() + Vector2(0, -95 if side == "enemy" else -82)
-		_spawn_damage_number(words, center + Vector2(0, -38 * shown), Color("ff9ca8") if debuff else Color("a8e7c9"), side, "debuff" if debuff else "buff", 30)
+		_spawn_damage_number(words, center + Vector2(0, -38 * shown), Color("d7bc82") if STATUS_RULES.neutral(status) else Color("ff9ca8") if debuff else Color("a8e7c9"), side, "debuff" if debuff else "buff", 30)
 		shown += 1
 
 func _spawn_damage_number(words: String, center: Vector2, color: Color, side: String, kind: String, font_size: int) -> void:
@@ -2550,11 +2596,15 @@ func _build_action_points() -> void:
 	_anya_rebirth = preload("res://scripts/ui/anya_rebirth_meter.gd").new()
 	holder.add_child(_anya_rebirth)
 	_anya_rebirth.hide()
+	if MOBILE.enabled():
+		holder.position = Vector2(494, 10)
+		holder.scale = Vector2(1.55, 1.55)
 
 func _display_hand_limit() -> int:
 	return _enemy_display_hand_limit if _enemy_damage_staged else FightSystem.expansion_hand_limit
 
 func _draw_hand_limit() -> void:
+	if MOBILE.enabled(): return
 	var limit := _display_hand_limit()
 	var constrained := limit < FightSystem.HAND_LIMIT
 	var tint := Color("edbc85") if constrained else Color("a4b5c8")
@@ -2566,6 +2616,13 @@ func _draw_hand_limit() -> void:
 	_dynamic.append(pane)
 
 func _draw_resource(title: String, key: String, pos: Vector2, color: Color) -> void:
+	if MOBILE.enabled():
+		if key != "deck": return
+		var menu := _compact_button("牌堆 / 记录", Rect2(42, 12, 420, 132), func(): _open_archive("hand"))
+		menu.name = "MobileBattleArchive"
+		menu.add_theme_font_size_override("font_size", 38)
+		_dynamic.append(menu)
+		return
 	var value := FightSystem.get_draw_count() if key == "deck" else FightSystem.get_discard_count() if key == "discard" else FightSystem.hand.size()
 	var button := _compact_button("%s %d" % [title, value], Rect2(pos, Vector2(96, 38)), func() -> void: _toggle_pile_popup(key) if key != "hand" else _show_fc_pile("hand"), color)
 	button.name = "Pile_" + key
@@ -2590,7 +2647,7 @@ func _draw_statuses(unit: Dictionary, pos: Vector2, ally: bool, available_width:
 			var taunt: Dictionary = statuses.pop_at(i)
 			statuses.push_front(taunt)
 			break
-	var step := 36.0
+	var step := 72.0 if MOBILE.enabled() else 36.0
 	var slots := maxi(1, int((available_width + 4.0) / step))
 	var visible_count := mini(statuses.size(), slots - 1) if statuses.size() > slots else statuses.size()
 	for i in visible_count:
@@ -2598,11 +2655,11 @@ func _draw_statuses(unit: Dictionary, pos: Vector2, ally: bool, available_width:
 		var status_for_icon := status.duplicate(true)
 		var icon_pos := pos + Vector2(i * step, 0)
 		var is_dead := String(status.get("icon", "")) == "dead"
-		var icon := _button("", icon_pos, Vector2(32, 32), _show_status_list.bind(statuses, String(unit.get("name", ""))), Color("#252830") if is_dead else Color("#ba87bd") if status.get("debuff", false) else Color("#76cbbd"), 15)
+		var icon := _button("", icon_pos, Vector2(64, 64) if MOBILE.enabled() else Vector2(32, 32), _show_status_list.bind(statuses, String(unit.get("name", ""))), Color("#252830") if is_dead else Color("#d7bc82") if STATUS_RULES.neutral(status) else Color("#ba87bd") if STATUS_RULES.is_debuff(status) else Color("#76cbbd"), 15)
 		icon.set_meta("status_chip", true)
 		icon.set_meta("status_key", String(status.get("icon", "")))
 		icon.set_meta("unit_id", String(unit.get("id", "")))
-		if ally: _paper_status_button(icon, Color("b77d92") if status.get("debuff", false) else Color("76a698"))
+		if ally: _paper_status_button(icon, Color("c3a56e") if STATUS_RULES.neutral(status) else Color("b77d92") if STATUS_RULES.is_debuff(status) else Color("76a698"))
 		var status_texture := _status_icon_texture(status)
 		if status_texture != null:
 			# Button.icon 在当前主题下会被内容边距压缩成空白按钮；用真实子节点
@@ -2614,7 +2671,7 @@ func _draw_statuses(unit: Dictionary, pos: Vector2, ally: bool, available_width:
 			image.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
 			image.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			icon.add_child(image)
-			_place(image, Rect2(Vector2(3, 3), Vector2(26, 26)))
+			_place(image, Rect2(Vector2(6, 6), Vector2(52, 52)) if MOBILE.enabled() else Rect2(Vector2(3, 3), Vector2(26, 26)))
 		icon.z_index = 30 if ally else 25
 		icon.modulate = Color(0.35, 0.35, 0.4, 1) if is_dead else Color.WHITE
 		# The custom detail card is the sole hover surface, including long hovers.
@@ -2626,12 +2683,13 @@ func _draw_statuses(unit: Dictionary, pos: Vector2, ally: bool, available_width:
 			var counter := FC_VISUALS.text(icon, badge_text, Rect2(5 if status.has("badge_text") else 10, 17, 27 if status.has("badge_text") else 22, 14), 10 if count > 99 or status.has("badge_text") else 11, Color("fff1c7"), true)
 			counter.add_theme_constant_override("outline_size", 4)
 			counter.add_theme_color_override("font_outline_color", Color("08121d"))
-		icon.mouse_entered.connect(func() -> void: _show_status_popup(status_for_icon, icon_pos + Vector2(0, 34)))
-		icon.mouse_exited.connect(_hide_status_popup)
+		if not preload("res://scripts/ui/tower_mobile.gd").enabled():
+			icon.mouse_entered.connect(func() -> void: _show_status_popup(status_for_icon, icon_pos + Vector2(0, 34)))
+			icon.mouse_exited.connect(_hide_status_popup)
 		_dynamic.append(icon)
 	if statuses.size() > visible_count:
 		var remaining := statuses.size() - visible_count
-		var more := _button("", pos + Vector2(visible_count * step, 0), Vector2(32, 32), _show_status_list.bind(statuses, String(unit.get("name", ""))), Color("d7bc8c"), 12)
+		var more := _button("", pos + Vector2(visible_count * step, 0), Vector2(64, 64) if MOBILE.enabled() else Vector2(32, 32), _show_status_list.bind(statuses, String(unit.get("name", ""))), Color("d7bc8c"), 12)
 		FC_VISUALS.text(more, "更多", Rect2(0, 0, 32, 32), 12, CHROME.INK if ally else BATTLE_THEME.ON_STAGE, true)
 		more.name = "StatusOverflow_%s_%s" % ["ally" if ally else "enemy", str(int(pos.x))]
 		if ally: _paper_status_button(more, CHROME.BRASS)
@@ -2641,6 +2699,11 @@ func _draw_statuses(unit: Dictionary, pos: Vector2, ally: bool, available_width:
 		_dynamic.append(more)
 
 func _show_status_list(statuses: Array, unit_name: String) -> void:
+	if MOBILE.enabled():
+		var descriptions: Array[String] = []
+		for status in statuses: descriptions.append("%s%s\n%s" % [status.get("name", "状态"), " · %d层" % int(status.get("stacks", 0)) if int(status.get("stacks", 0)) > 0 else "", status.get("desc", "")])
+		MOBILE.instance().show_help(unit_name + " · 全部状态", "\n\n".join(descriptions))
+		return
 	if is_instance_valid(_status_list): _status_list.queue_free()
 	_hide_status_popup()
 	_status_list = preload("res://scripts/ui/battle_status_list.gd").new()
@@ -2691,9 +2754,13 @@ func _draw_intent(intent: Dictionary, pos: Vector2, index: int) -> void:
 	if String(FightSystem.enemies[index].id) == "cupid": description += "\nlove达到100：1回合迷魂；抽到自己的攻击牌自动伤害队友。"
 	if damage > 0: description += "\n\n基础伤害：" + _intent_damage_text(intent) + "\n" + _intent_damage_detail(intent, index)
 	var detail := {"name":"敌人意图：" + String(intent.get("name", "等待")), "desc":description}
+	button.set_meta("mobile_intent", detail)
 	# Use one custom popup; a native tooltip would cover it after a longer hover.
-	button.mouse_entered.connect(func() -> void: _show_intent_popup(detail, Rect2(pos, button.size), tint))
-	button.mouse_exited.connect(_hide_status_popup)
+	if preload("res://scripts/ui/tower_mobile.gd").enabled():
+		button.pressed.connect(func(): preload("res://scripts/ui/tower_mobile.gd").instance().show_help(detail.name, detail.desc))
+	else:
+		button.mouse_entered.connect(func() -> void: _show_intent_popup(detail, Rect2(pos, button.size), tint))
+		button.mouse_exited.connect(_hide_status_popup)
 	_dynamic.append(button)
 
 func _intent_damage_text(intent: Dictionary) -> String:
@@ -2787,8 +2854,8 @@ func _ultimate_card(index: int, x: float) -> Control:
 	button.mouse_exited.connect(func() -> void:
 		if _hovered_ultimate == index: _hovered_ultimate = -1
 	)
-	button.tooltip_text = ("左键选择后点击敌人；右键查看效果" if String(ultimate.get("target", "enemy")) == "enemy" else "左键立即释放；右键查看效果") if ready else "终结技能量未满；右键查看效果"
-	if automatic: button.tooltip_text = "锁定 · 退场时自动释放；右键查看回场规则"
+	button.tooltip_text = preload("res://scripts/ui/tower_mobile.gd").words(("左键选择后点击敌人；右键查看效果" if String(ultimate.get("target", "enemy")) == "enemy" else "左键立即释放；右键查看效果") if ready else "终结技能量未满；右键查看效果")
+	if automatic: button.tooltip_text = preload("res://scripts/ui/tower_mobile.gd").words("锁定 · 退场时自动释放；右键查看回场规则")
 	button.gui_input.connect(func(event: InputEvent) -> void:
 		if event is InputEventMouseButton and (event as InputEventMouseButton).button_index == MOUSE_BUTTON_RIGHT and (event as InputEventMouseButton).pressed:
 			_show_ultimate_popup(index, x)
@@ -2833,6 +2900,12 @@ func _show_skill_popup(index: int) -> void:
 	box.add_child(body)
 
 func _show_ultimate_popup(index: int, x: float) -> void:
+	if MOBILE.enabled():
+		var mobile_ultimate := FightSystem.get_ultimate(index)
+		var ready := FightSystem.can_ultimate(index) and (FightSystem.tutorial_step < 0 or FightSystem.tutorial_step >= 4)
+		var action_text := "选择目标" if String(mobile_ultimate.get("target", "self")) in ["enemy", "ally"] else "准备释放"
+		MOBILE.instance().show_help(String(mobile_ultimate.get("name", "终结技")), "%s\n\n当前充能：%d / %d\n目标：%s\n%s" % [mobile_ultimate.get("desc", ""), int(FightSystem.allies[index].get("ult", 0)), FightSystem.ultimate_max(index), FightData.target_name(String(mobile_ultimate.get("target", "self"))), "退场时自动释放，无法主动操作。" if mobile_ultimate.get("locked", false) else "充能已满，可准备释放。" if ready else "充能尚未满。"] + "\n\n" + preload("res://scripts/ui/battle_mobile_preview.gd").describe(-1, index), action_text if ready else "", func(): _request_ultimate(index))
+		return
 	if index < 0 or index >= FightSystem.allies.size():
 		return
 	_hide_skill_popup()
@@ -2899,8 +2972,8 @@ func _show_battle_detail(detail: Dictionary, anchor: Rect2, tint: Color, is_stat
 	column.add_theme_constant_override("separation", 9)
 	_status_popup.add_child(column)
 	var caption := Label.new()
-	caption.text = ("负 面 状 态" if detail.get("debuff", false) else "增 益 状 态") if is_status else "敌 人 意 图"
-	if is_status and String(detail.get("icon", "")) in ["dead", "downed"]: caption.text = "角 色 状 态"
+	if is_status: caption.name = "StatusCategory"
+	caption.text = STATUS_RULES.caption(detail) if is_status else "敌 人 意 图"
 	caption.add_theme_font_size_override("font_size", 14)
 	caption.add_theme_color_override("font_color", BATTLE_THEME.quiet(tint))
 	caption.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -2963,7 +3036,7 @@ func _show_status_popup(status: Dictionary, pos: Vector2) -> void:
 		var duration := "无回合限制" if int(detail.turns) < 0 else "剩余 %d 回合" % int(detail.turns)
 		var stacks := " · %d 层" % int(detail.stacks) if int(detail.get("stacks", 0)) > 1 else ""
 		detail.desc = String(detail.get("desc", "")).trim_suffix(" " + duration + stacks)
-	_show_battle_detail(detail, Rect2(pos - Vector2(0, 34), Vector2(32, 32)), Color("d4a5cc") if status.get("debuff", false) else Color("9acfc4"), true)
+	_show_battle_detail(detail, Rect2(pos - Vector2(0, 34), Vector2(32, 32)), Color("d7bc82") if STATUS_RULES.neutral(status) else Color("d4a5cc") if STATUS_RULES.is_debuff(status) else Color("9acfc4"), true)
 
 func _fit_status_popup(popup: Control) -> void:
 	if not is_instance_valid(popup): return
@@ -2986,7 +3059,7 @@ func _icon_texture(icon_name: String) -> Texture2D:
 
 
 func _status_icon_texture(status: Dictionary) -> Texture2D:
-	return BATTLE_ART.status_icon(String(status.get("icon", "")), bool(status.get("debuff", false)), String(status.get("art_key", "")))
+	return BATTLE_ART.status_icon(String(status.get("icon", "")), STATUS_RULES.is_debuff(status), String(status.get("art_key", "")))
 
 func _toggle_log_popup() -> void:
 	_open_archive("log")
@@ -3049,7 +3122,10 @@ func _show_result(won: bool) -> void:
 	_result_panel.configure(won, FightSystem.last_reward, FightSystem.allies, FightSystem.round, not FightSystem.return_location.is_empty())
 	_relayout()
 
-func _leave_battle() -> void:
+func _leave_battle(confirmed: bool = false) -> void:
+	if MOBILE.enabled() and FightSystem.battle_active and not confirmed:
+		MOBILE.instance().show_help("撤退回塔", "撤退会结束这场战斗并按撤退规则结算。确定离开吗？", "确认撤退", func(): _leave_battle(true))
+		return
 	if TowerRun.active:
 		if _turn_interaction_locked(): return
 		if FightSystem.last_reward.get("wave_clear", false) and TowerRun.has_next_wave():
@@ -3120,7 +3196,7 @@ func _progress_bar(pos: Vector2, size: Vector2, value: int, maximum: int, color:
 		BATTLE_THEME.decorate(poison_fill, poison_color)
 	if text != "":
 		var label := Label.new()
-		label.text = text
+		label.text = MOBILE.words(text)
 		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		label.add_theme_font_size_override("font_size", 14)
@@ -3164,7 +3240,7 @@ func _label_in(parent: Node, text: String, pos: Vector2, size: Vector2, font: in
 	parent.add_child(label)
 	# Establish the wrapping width before text calculates its minimum height.
 	_place(label, Rect2(pos, size))
-	label.text = text
+	label.text = MOBILE.words(text)
 	return label
 func _button(text: String, pos: Vector2, size: Vector2, handler: Callable, accent: Color, font: int) -> Button:
 	return _button_in(_ui,text,pos,size,handler,accent,font)
@@ -3206,6 +3282,9 @@ func _hide_calculation() -> void:
 func _toggle_calculation() -> void:
 	var owner: int = FightSystem._ally_index("zhoumingyuan")
 	if not FightSystem.fc.is_math(owner) or _turn_interaction_locked(): return
+	if MOBILE.enabled():
+		_open_archive("calculation")
+		return
 	if is_instance_valid(_calculation_popup):
 		_hide_calculation()
 		return
@@ -3247,13 +3326,21 @@ func _toggle_calculation() -> void:
 		FC_VISUALS.text(row, FC_VISUALS.card_title(card), Rect2(107, 3, 300, 29), 21, BATTLE_THEME.TEXT)
 		var effect := "追加技能" if card.get("counterfeit", false) else "回复1能量" if card.get("lemma", false) else "追击弹药"
 		FC_VISUALS.text(row, ("下一张 · " if i == 0 else "") + effect, Rect2(107, 32, 300, 23), 16, FC_VISUALS.MUTED)
+		if preload("res://scripts/ui/tower_mobile.gd").enabled():
+			row.pressed.connect(func(): _show_fc_card_detail(card))
+			row.custom_minimum_size.y = 100
 		row.gui_input.connect(func(event: InputEvent) -> void:
 			if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
 				_show_fc_card_detail(card)
 				row.accept_event()
 		)
-	var close := _button_in(pane, "关闭", Vector2(434, 448), Vector2(142, 38), _hide_calculation, Color("95d0df"), 18)
+	var close := _button_in(pane, "关闭", Vector2(434, 448), Vector2(142, 90) if MOBILE.enabled() else Vector2(142, 38), _hide_calculation, Color("95d0df"), 18)
 	close.name = "CloseCalculation"
+	if MOBILE.enabled():
+		pane.scale = Vector2.ONE * 1.5
+		pane.position = Vector2(520, 160)
+		pane.size.y = 560
+		MOBILE.register_back(_calculation_popup, _hide_calculation)
 	FC_VISUALS.text(pane, "点击空白处或按 Esc 关闭", Rect2(24, 450, 390, 34), 17, FC_VISUALS.MUTED)
 
 func _show_fc_card_detail(card: Dictionary) -> void:
@@ -3379,3 +3466,38 @@ func _present_anya_transition(kind: String, resolve: Callable) -> void:
 	, CONNECT_ONE_SHOT)
 	_ui.add_child(_ultimate_cutin)
 	_refresh()
+
+func _mobile_back() -> void:
+	if _commands.pending(): _commands.cancel(); return
+	if FightSystem.pending_target_type() != "":
+		_clear_drag_visual()
+		FightSystem.cancel_targeting()
+		return
+	_open_battle_settings()
+
+func _mobile_hand_ticket(data: Dictionary, index: int) -> Button:
+	var id := String(data.skill_id)
+	var card := _button("", Vector2.ZERO, Vector2(420, 144), func(): pass, FightData.rarity_color(id), 34)
+	FC_VISUALS.icon(card, FightData.skill_icon(id), Rect2(12, 18, 88, 88))
+	var title := FC_VISUALS.text(card, FightData.skill(id).get("name", id), Rect2(116, 14, 290, 58), 40)
+	title.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	FC_VISUALS.text(card, "能量 %s · %s" % [str(FightSystem.card_cost(data)), FC_VISUALS.owner_name(data)], Rect2(116, 80, 290, 46), 32, BATTLE_THEME.GOLD)
+	if index >= 0 and FightSystem.pending_card == index: BATTLE_THEME.button(card, BATTLE_THEME.GOLD, true)
+	return card
+
+func _mobile_statuses() -> void:
+	var words := PackedStringArray()
+	for unit in FightSystem.allies + FightSystem.enemies:
+		words.append("%s · 生命 %d / %d" % [unit.name, unit.hp, unit.max_hp])
+		var statuses := FightData.statuses(unit)
+		if statuses.is_empty(): words.append("无附加状态")
+		for status in statuses: words.append("%s · %d层\n%s" % [status.get("name", ""), int(status.get("stacks", 0)), status.get("desc", "")])
+	for index in FightSystem.enemies.size():
+		var intent := _ui.find_child("EnemyIntent_%d" % index, true, false)
+		if intent != null and intent.has_meta("mobile_intent"):
+			var detail: Dictionary = intent.get_meta("mobile_intent")
+			words.append(FightSystem.enemies[index].name + " · " + detail.name + "\n" + detail.desc)
+	var choices: Array[Dictionary] = []
+	for index in FightSystem.allies.size():
+		choices.append({"text":FightSystem.allies[index].name + " · 终结技详情与预估", "action":func(): _show_ultimate_popup(index, 0)})
+	MOBILE.instance().show_help("全部状态与敌人意图", "\n\n".join(words), "", Callable(), false, choices)

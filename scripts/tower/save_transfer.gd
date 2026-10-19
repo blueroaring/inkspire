@@ -78,7 +78,7 @@ static func export_bundle(path: String) -> bool:
 		return false
 	return true
 
-static func inspect_import(path: String) -> Dictionary:
+static func inspect_import(path: String, journal_source: String = "") -> Dictionary:
 	var raw := read_bounded(path)
 	var history := ""
 	var parser := JSON.new()
@@ -92,7 +92,9 @@ static func inspect_import(path: String) -> Dictionary:
 	else:
 		# The original 0.1.0 slot and its adjacent journal can be imported directly.
 		var history_path := path.trim_suffix(".bak").trim_suffix(".json") + "_battles.jsonl"
-		if FileAccess.file_exists(history_path):
+		if path.begins_with("content://"): history_path = ""
+		if not journal_source.is_empty(): history_path = journal_source
+		if not journal_source.is_empty() or (not history_path.is_empty() and FileAccess.file_exists(history_path)):
 			history = read_bounded(history_path)
 			if history.is_empty() and file_size(history_path) != 0: return {}
 	var saved := decode_save(raw)
@@ -102,14 +104,14 @@ static func inspect_import(path: String) -> Dictionary:
 		var entry: Variant = parser.data
 		if not entry is Dictionary: return {}
 		if entry.get("schema") == CRYPTO.SCHEMA and CRYPTO.open(entry, "battle").is_empty(): return {}
-	return {"save":saved, "raw":raw, "journal":history}
+	return {"save":saved, "raw":raw, "journal":history, "portable":parsed is Dictionary and parsed.get("purpose") == "transfer"}
 
-static func import_bundle(path: String, selected_slot: int) -> bool:
+static func import_bundle(path: String, selected_slot: int, journal_source: String = "") -> bool:
 	TowerRun.error = ""
 	if TowerRun.read_only or selected_slot < 1 or selected_slot > 3 or FightSystem.battle_active or not TowerRun.pending.is_empty():
 		TowerRun.error = "当前无法导入，请先回到尖塔存档界面。"
 		return false
-	var imported := inspect_import(path)
+	var imported := inspect_import(path, journal_source)
 	if imported.is_empty():
 		TowerRun.error = "文件不是有效的尖塔存档或迁移包，或校验未通过；原有存档未改动。"
 		return false

@@ -23,6 +23,7 @@ var minimum_seconds := 0.0
 var _real_elapsed := 0.0
 
 func _ready() -> void:
+	preload("res://scripts/ui/tower_mobile.gd").register_back(self, complete)
 	name = "UltimateCutin"
 	z_index = 150
 	size = Vector2(1920, 1080)

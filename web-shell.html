@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>高中异闻：尖塔 · 在线游玩</title>
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#111e25;color:#e8e5d6;font:16px/1.65 system-ui,sans-serif}
+canvas{display:block;width:100%;height:100%;touch-action:none;outline:none}
+#safe-insets{position:fixed;inset:0;pointer-events:none;visibility:hidden;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+#cover{position:fixed;inset:0;display:grid;place-items:center;background:radial-gradient(ellipse at top,#29434b,#101c24);padding:max(20px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left));overflow:auto}
+main{max-width:650px}h1{font-size:clamp(26px,5vw,44px);font-weight:500;color:#e3c99a;margin:0 0 12px}
+button,a{font:inherit}button{min-height:48px;border:1px solid #e3c99a;border-radius:8px;padding:10px 24px;background:#d3bf96;color:#162931;cursor:pointer}
+a{color:#e3c99a}progress{display:block;width:100%;height:20px;margin:20px 0}#status{white-space:pre-wrap}#rotate{display:none;position:fixed;inset:0;background:#101c24;place-items:center;text-align:center;padding:30px;z-index:5}
+@media (pointer:coarse) and (orientation:portrait){#rotate{display:grid}}
+</style>
+$GODOT_HEAD_INCLUDE
+</head>
+<body>
+<canvas id="canvas" tabindex="0" aria-label="尖塔游戏画面">浏览器需要支持 Canvas 和 WebGL 2。</canvas>
+<div id="safe-insets"></div>
+<div id="cover"><main><h1>高中异闻：尖塔</h1>
+<p>组建队伍、搭配技能，逐层挑战。手机请横屏游玩，点按操作、滑动列表。</p>
+<p>首次需要下载游戏资源。进度保存在当前浏览器中；换设备或清除网站数据前，请在游戏的「存档」页导出迁移包。</p>
+<button id="start" type="button">加载并开始游戏</button>
+<progress id="progress" max="1" value="0" hidden></progress><p id="status" role="status"></p>
+<a href="/">返回官网</a>
+</main></div>
+<div id="rotate"><div>请将手机转为横屏<br>横屏可完整显示战场和触控按钮。</div></div>
+<script src="$GODOT_URL"></script>
+<script src="telemetry.js"></script>
+<script>
+const config = $GODOT_CONFIG;
+const engine = new Engine(config);
+const start = document.getElementById('start');
+const status = document.getElementById('status');
+const progress = document.getElementById('progress');
+let launched = false;
+start.addEventListener('click', async () => {
+  if (launched) return;
+  launched = true; start.disabled = true; progress.hidden = false;
+  try {
+    const missing = Engine.getMissingFeatures({threads: $GODOT_THREADS_ENABLED});
+    if (missing.length) throw new Error('当前浏览器缺少：' + missing.join('、') + '。请使用支持 WebGL 2 的新版浏览器，或从官网下载安装版。');
+    status.textContent = '正在下载并准备资源…';
+    await engine.startGame({
+      canvas: document.getElementById('canvas'),
+      onProgress(current,total) {
+        progress.value=current; progress.max=Math.max(total,1);
+        status.textContent='正在加载 ' + (current/1048576).toFixed(1) + (total ? ' / '+(total/1048576).toFixed(1) : '') + ' MB';
+      },
+      onExit() { document.getElementById('cover').style.display='grid'; status.textContent='游戏已结束，可刷新页面重新开始。'; start.textContent='重新开始'; start.disabled=false; start.onclick=()=>location.reload(); }
+    });
+    document.getElementById('cover').style.display='none';
+    document.getElementById('canvas').focus();
+  } catch (error) {
+    status.textContent='启动失败：' + (error.message || error);
+    start.textContent='刷新后重试'; start.disabled=false;
+    start.onclick=()=>location.reload();
+    console.error(error);
+  }
+});
+</script>
+</body>
+</html>

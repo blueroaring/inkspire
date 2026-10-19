@@ -6,6 +6,7 @@ const M := preload("res://scripts/ui/battle_management_ui.gd")
 const ROOT := "res://assets/graphics/battle/anya/"
 
 func _ready() -> void:
+	preload("res://scripts/ui/tower_mobile.gd").register_back(self, queue_free)
 	name = "AnyaFormReference"
 	size = Vector2(1920, 1080)
 	z_index = 200
@@ -17,7 +18,7 @@ func _ready() -> void:
 	var panel := M.panel(Rect2(110, 70, 1700, 940), Color("111b30"), Color("c6a97c"))
 	add_child(panel)
 	M.heading(panel, "幻羽涅槃 · 双形态技能对照", Rect2(36, 24, 1350, 48), 31).add_theme_color_override("font_color", Color("edf2fc"))
-	panel.add_child(M.button("关闭", Rect2(1514, 24, 150, 48), queue_free))
+	panel.add_child(M.button("关闭", Rect2(1370, 10, 290, 120) if preload("res://scripts/ui/tower_mobile.gd").enabled() else Rect2(1514, 24, 150, 48), queue_free))
 	for i in 2:
 		var x := 38 + i * 830
 		var form := "bound" if i == 0 else "phoenix"
@@ -40,7 +41,7 @@ func _ready() -> void:
 	rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	rows.add_theme_constant_override("separation", 12)
 	scroll.add_child(rows)
-	var ultimate_row := HBoxContainer.new()
+	var ultimate_row: BoxContainer = VBoxContainer.new() if preload("res://scripts/ui/tower_mobile.gd").enabled() else HBoxContainer.new()
 	ultimate_row.add_theme_constant_override("separation", 20)
 	rows.add_child(ultimate_row)
 	for phoenix in [false, true]:
@@ -56,7 +57,7 @@ func _ready() -> void:
 			detail.ultimate = ultimate
 			add_child(detail))
 	for n in range(1, 14):
-		var row := HBoxContainer.new()
+		var row: BoxContainer = VBoxContainer.new() if preload("res://scripts/ui/tower_mobile.gd").enabled() else HBoxContainer.new()
 		row.add_theme_constant_override("separation", 20)
 		rows.add_child(row)
 		for prefix in ["LA", "LP"]:
@@ -80,7 +81,8 @@ func _ready() -> void:
 			box.add_child(words)
 			var heading := Label.new()
 			heading.text = "%02d  %s · %s %d" % [n, def.name, "能量" if prefix == "LA" else "重生", def.cost]
-			heading.add_theme_font_size_override("font_size", 21)
+			heading.add_theme_font_size_override("font_size", 38 if preload("res://scripts/ui/tower_mobile.gd").enabled() else 21)
+			heading.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			heading.add_theme_color_override("font_color", Color("f5d69e"))
 			words.add_child(heading)
 			var body := Label.new()
@@ -88,7 +90,7 @@ func _ready() -> void:
 			body.text = FightData.description(id, FightProgression.hero_level("li_anya"))
 			body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			body.add_theme_font_size_override("font_size", 18)
+			body.add_theme_font_size_override("font_size", 38 if preload("res://scripts/ui/tower_mobile.gd").enabled() else 18)
 			words.add_child(body)
 
 func _input(event: InputEvent) -> void:

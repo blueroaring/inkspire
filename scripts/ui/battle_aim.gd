@@ -51,7 +51,7 @@ func _process(delta: float) -> void:
 		var forecast_top := target.end.y-(202 if target.size.y >= 300 else 154)
 		top = minf(top, forecast_top-preview.size.y-12)
 	preview.position = Vector2(clampf(pointer.x + 26, 12, 1920-preview.size.x-12), clampf(top, 12, 1080-preview.size.y-12))
-	hint.text = "松手释放" if target.has_area() else "拖向目标 · 右键取消"
+	hint.text = ("点目标确认 · 可取消选取" if preload("res://scripts/ui/tower_mobile.gd").enabled() else "松手释放" if target.has_area() else "拖向目标 · 右键取消")
 	hint.add_theme_color_override("font_color", THEME.GREEN if target.has_area() else THEME.MUTED)
 	queue_redraw()
 

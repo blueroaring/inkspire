@@ -15,6 +15,9 @@ var continue_button: Button
 var victory_message := "赢了，大家辛苦了。"
 
 func configure(victory: bool, reward: Dictionary, party: Array, rounds: int, returning: bool) -> void:
+	if preload("res://scripts/ui/tower_mobile.gd").enabled():
+		_mobile_result(victory, reward, party, rounds)
+		return
 	won = victory
 	accent = Color("ebcb8c") if won else Color("cba4bf")
 	name = "BattleResultCinematic"
@@ -237,3 +240,54 @@ func _line(parent: Control, rect: Rect2, color: Color) -> ColorRect:
 	line.mouse_filter = MOUSE_FILTER_IGNORE
 	parent.add_child(line)
 	return line
+
+func _mobile_result(victory: bool, reward: Dictionary, party: Array, rounds: int) -> void:
+	won = victory
+	reveal = 1
+	name = "BattleResultCinematic"
+	size = Vector2(1920, 1080)
+	z_index = 100
+	mouse_filter = Control.MOUSE_FILTER_STOP
+	var pages := preload("res://scripts/ui/tower_mobile_pages.gd")
+	sheet = Panel.new()
+	sheet.position = Vector2(40, 30)
+	sheet.size = Vector2(1840, 1020)
+	sheet.add_theme_stylebox_override("panel", THEME.frame(THEME.INK, THEME.GOLD, 2, 12))
+	add_child(sheet)
+	var scroll := ScrollContainer.new()
+	scroll.position = Vector2(40, 40)
+	scroll.size = Vector2(1760, 770)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	sheet.add_child(scroll)
+	var rows := VBoxContainer.new()
+	rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	rows.add_theme_constant_override("separation", 30)
+	scroll.add_child(rows)
+	pages.text(rows, ("连战 · 本场胜利" if reward.get("wave_clear", false) else "战斗胜利" if won else "战斗失利") + " · 第%d回合" % rounds, 58)
+	if won:
+		pages.text(rows, "每位队员经验 +%d" % int(reward.get("xp", 0)))
+		if reward.get("wave_clear", false): pages.text(rows, "本层奖励在整层通关后领取。继续后进入第 %d / %d 场；存活队员回复20%%生命。" % [reward.next_wave, reward.wave_count])
+		elif reward.get("replay", false): pages.text(rows, "重演只获得经验，不推进层数或获得资源。")
+		else: pages.text(rows, "爬塔进度：第%d层\n墨痕碎片 +%d" % [TowerRun.data.highest, int(reward.get("item_count", 0))])
+		if reward.has("weapon"): pages.text(rows, "专武已解锁：" + FightEquipmentData.definition(reward.weapon).name)
+	else:
+		pages.text(rows, "已还原本层连战前的生命与道具，再次挑战从第一场开始。" if reward.get("chain_restarted", false) else "已还原到战前的生命、道具与角色状态，保留失败记录。调整好队伍后可以再次挑战。" if reward.get("rewound", false) else "本次挑战没有获得奖励，可以调整队伍再次挑战。")
+	if int(reward.get("recovery", 0)) > 0:
+		pages.text(rows, "恢复次数 +%d · 已储存 %d 次" % [int(reward.recovery), TowerRun.recovery_charges()])
+	for growth in reward.get("growth", []):
+		pages.text(rows, "%s · Lv.%d → Lv.%d · 经验 %d / %d" % [growth.name, int(growth.before_level), int(growth.level), int(growth.xp), TowerData.xp_needed(int(growth.level))])
+	for unit in party: pages.text(rows, "%s · 生命 %d / %d%s" % [unit.name, unit.hp, unit.max_hp, " · 已退场" if unit.get("dead", false) else ""])
+	continue_button = Button.new()
+	continue_button.name = "ResultContinue"
+	continue_button.position = Vector2(40, 850)
+	continue_button.size = Vector2(1760, 144)
+	continue_button.text = "继续连战" if reward.get("wave_clear", false) else "返回尖塔"
+	continue_button.add_theme_font_size_override("font_size", 44)
+	THEME.button(continue_button, THEME.GOLD)
+	continue_button.pressed.connect(func():
+		if continue_button.disabled: return
+		continue_button.disabled = true
+		continued.emit())
+	sheet.add_child(continue_button)
+	preload("res://scripts/ui/tower_mobile.gd").register_back(self, func():
+		if not continue_button.disabled: continue_button.pressed.emit())

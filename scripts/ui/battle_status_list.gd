@@ -1,4 +1,5 @@
 extends Control
+const STATUS := preload("res://scripts/fight/status_rules.gd")
 const THEME := preload("res://scripts/ui/battle_theme.gd")
 const V := preload("res://scripts/ui/fc_card_visuals.gd")
 const ART := preload("res://scripts/data/battle_art.gd")
@@ -6,6 +7,7 @@ var statuses: Array = []
 var title := "全部状态"
 
 func _ready() -> void:
+	preload("res://scripts/ui/tower_mobile.gd").register_back(self, queue_free)
 	THEME.apply(self)
 	name = "BattleStatusList"
 	z_index = 112
@@ -63,7 +65,7 @@ func _ready() -> void:
 		elif stacks > 0:
 			heading.text += "  ·  %d 层" % stacks
 		heading.add_theme_font_size_override("font_size", 21)
-		heading.add_theme_color_override("font_color", THEME.RED if status.get("debuff", false) else THEME.GREEN)
+		heading.add_theme_color_override("font_color", THEME.GOLD if STATUS.neutral(status) else THEME.RED if STATUS.is_debuff(status) else THEME.GREEN)
 		box.add_child(heading)
 		var body := Label.new()
 		body.text = String(status.get("desc", ""))

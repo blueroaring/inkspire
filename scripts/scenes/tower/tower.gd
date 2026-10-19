@@ -1,4 +1,5 @@
 extends Control
+const MOBILE := preload("res://scripts/ui/tower_mobile.gd")
 const T := preload("res://scripts/ui/battle_theme.gd")
 const DATA := preload("res://scripts/data/tower_data.gd")
 const BG := preload("res://scripts/ui/tower_backdrop.gd")
@@ -24,6 +25,11 @@ var tutorial_practice := ""
 func _ready() -> void:
 	DisplayServer.window_set_title(DATA.GAME_TITLE)
 	TowerRun.enter()
+	preload("res://scripts/ui/tower_mobile.gd").ensure(get_tree())
+	if OS.has_feature("web") and not get_tree().root.has_node("TowerWeb"):
+		var browser := preload("res://scripts/tower/web_files.gd").new()
+		browser.name = "TowerWeb"
+		get_tree().root.add_child.call_deferred(browser)
 	TowerRun.finish_lesson_session()
 	if not TowerRun.data.is_empty():
 		page = "shop" if TowerRun.shop_available() and TowerRun.data.get("shop_arrival", false) else "lobby"
@@ -58,9 +64,15 @@ func _refresh() -> void:
 	body.size = Vector2(1920, 1080)
 	canvas.add_child(body)
 	var bg := BG.new()
+	bg.name = "TowerBackdrop"
 	bg.size = body.size
 	bg.highest = int(TowerRun.data.get("highest", 0))
 	body.add_child(bg)
+	if MOBILE.enabled():
+		preload("res://scripts/ui/tower_mobile_pages.gd").build(self)
+		MOBILE.register_back(self, _mobile_back)
+		if TowerRun.onboarding_pending() and tutorial_practice.is_empty(): _open_tutorial.call_deferred()
+		return
 	text("HIGH SCHOOL CHRONICLES", Rect2(70, 50, 620, 38), 21, Color("dbc699"))
 	text("高中异闻", Rect2(70, 96, 620, 80), 58, Color("ecede1"))
 	text("— 尖塔 —", Rect2(76, 182, 610, 57), 34, Color("dbc699"))
@@ -79,12 +91,14 @@ func _refresh() -> void:
 			"report": _report()
 	status = text("" if page == "title" else TowerRun.notice, Rect2(740, 978, 1100, 70), 20, Color("e5c78c"))
 	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	if preload("res://scripts/ui/tower_mobile.gd").enabled():
+		preload("res://scripts/ui/tower_mobile.gd").register_back(self, _mobile_back)
 	if TowerRun.onboarding_pending() and tutorial_practice.is_empty(): _open_tutorial.call_deferred()
 
 func text(value: String, rect: Rect2, font_size: int = 22, color: Color = TEXT, parent: Node = null) -> Label:
 	var label := Label.new()
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	label.text = value
+	label.text = preload("res://scripts/ui/tower_mobile.gd").words(value)
 	label.position = rect.position
 	label.size = rect.size
 	label.add_theme_font_override("font", T.HEADING if font_size >= 26 else T.BODY)
@@ -302,6 +316,7 @@ func _floor_recommendations(floor_info: Dictionary) -> void:
 	overlay.name = "TowerFloorStrategyOverlay"
 	overlay.size = Vector2(1920, 1080)
 	canvas.add_child(overlay)
+	preload("res://scripts/ui/tower_mobile.gd").register_back(overlay, overlay.queue_free)
 	var dim := ColorRect.new()
 	dim.size = overlay.size
 	dim.color = Color(0.01, 0.03, 0.06, 0.82)
@@ -351,6 +366,7 @@ func _begin() -> void:
 
 func _floor_map() -> void:
 	var frame := panel(Rect2(64, 272, 616, 696))
+	frame.name = "MobileFloorList"
 	text("选择楼层", Rect2(24, 17, 300, 44), 30, GOLD, frame)
 	text("向上滚动查看更多楼层 · 点击选关", Rect2(24, 66, 558, 32), 19, MUTED, frame)
 	var scroll := ScrollContainer.new()
@@ -395,10 +411,14 @@ func _floor_map() -> void:
 	button("后40层 ↑", Rect2(380, 632, 212, 45), func(): chosen_floor = mini(latest, chosen_floor + 40); _refresh(), false, chosen_floor >= latest, frame)
 
 func _formation_picker(slot_index: int) -> void:
+	if MOBILE.enabled():
+		preload("res://scripts/ui/tower_mobile_pages.gd").formation(self, slot_index)
+		return
 	var overlay := Control.new()
 	overlay.name = "TowerFormationPicker"
 	overlay.size = Vector2(1920, 1080)
 	canvas.add_child(overlay)
+	preload("res://scripts/ui/tower_mobile.gd").register_back(overlay, overlay.queue_free)
 	var dim := ColorRect.new()
 	dim.size = overlay.size
 	dim.color = Color(0.01, 0.03, 0.06, 0.76)
@@ -515,11 +535,15 @@ func _shop() -> void:
 	button("装备遗物", Rect2(1555, 893, 299, 56), _characters)
 
 func _equipment_detail(id: String) -> void:
+	if MOBILE.enabled():
+		MOBILE.instance().show_help(FightEquipmentData.definition(id).name, FightEquipmentData.description(id))
+		return
 	var overlay := Control.new()
 	overlay.name = "TowerEquipmentDetail"
 	overlay.size = Vector2(1920, 1080)
 	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
 	canvas.add_child(overlay)
+	preload("res://scripts/ui/tower_mobile.gd").register_back(overlay, overlay.queue_free)
 	var shade := ColorRect.new()
 	shade.size = overlay.size
 	shade.color = Color(0.02, 0.03, 0.05, 0.8)
@@ -560,13 +584,22 @@ func _saves() -> void:
 	button("导出迁移包", Rect2(1100, 891, 320, 56), _export_save, false, TowerRun.data.is_empty()).name = "ExportSaveTransfer"
 	button("打开存档文件夹", Rect2(1440, 891, 414, 56), func():
 		DirAccess.make_dir_recursive_absolute(TowerRun.save_root)
-		OS.shell_open(ProjectSettings.globalize_path(TowerRun.save_root)))
+		_open_save_location())
 
 func _export_save() -> void:
+	if OS.has_feature("web"):
+		var path := "user://web-transfer.inksave"
+		if TowerRun.TRANSFER.export_bundle(path):
+			get_node("/root/TowerWeb").download(path, "InkSpire-slot%d.inksave" % TowerRun.slot, "application/octet-stream")
+			TowerRun.notice = "浏览器已开始下载迁移包，包含当前存档与完整战斗记录。"
+		else: TowerRun.notice = TowerRun.error
+		_refresh()
+		return
 	var dialog := FileDialog.new()
 	dialog.title = "导出可迁移的尖塔存档"
 	dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
+	if OS.has_feature("android"): dialog.use_native_dialog = true
 	dialog.filters = PackedStringArray(["*.inksave ; 尖塔迁移包"])
 	dialog.current_dir = OS.get_system_dir(OS.SYSTEM_DIR_DOCUMENTS)
 	dialog.current_file = "InkSpire-slot%d.inksave" % TowerRun.slot
@@ -579,29 +612,27 @@ func _export_save() -> void:
 	dialog.popup_centered(Vector2i(960, 640))
 
 func _import_save(selected_slot: int) -> void:
+	if OS.has_feature("web"):
+		get_node("/root/TowerWeb").pick(".inksave,.json,.bak", func(path: String): _review_import(path, selected_slot))
+		return
 	var dialog := FileDialog.new()
 	dialog.title = "导入到第 %d 槽：旧版存档或迁移包" % selected_slot
 	dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILE
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
+	if OS.has_feature("android"): dialog.use_native_dialog = true
 	dialog.filters = PackedStringArray(["*.inksave,*.json,*.bak ; 尖塔存档或迁移包"])
 	dialog.current_dir = OS.get_system_dir(OS.SYSTEM_DIR_DOCUMENTS)
 	dialog.file_selected.connect(func(path: String):
 		dialog.queue_free()
-		var imported := TowerRun.TRANSFER.inspect_import(path)
-		if imported.is_empty():
-			TowerRun.notice = "无法读取此文件：请选择尖塔存档或迁移包；原有记录未改动。"
-			_refresh()
-			return
-		var saved: Dictionary = imported.save
-		confirm("将「%s」的最高 %d 层进度导入第 %d 槽。\n该槽原有记录会先备份，再替换；其他槽位不受影响。\n来源版本：%s" % [saved.nickname, saved.highest, selected_slot, saved.get("last_played_build", saved.get("build", "旧版"))], func():
-			if TowerRun.TRANSFER.import_bundle(path, selected_slot): chosen_floor = int(TowerRun.data.highest) + 1
-			else: TowerRun.notice = TowerRun.error
-			_refresh()))
+		_review_import(path, selected_slot))
 	dialog.canceled.connect(dialog.queue_free)
 	add_child(dialog)
 	dialog.popup_centered(Vector2i(960, 640))
 
 func _new_dialog(selected_slot: int, overwrite: bool) -> void:
+	if MOBILE.enabled():
+		MOBILE.instance().show_help("新建爬塔存档", ("此槽已有记录，创建后将覆盖。\n" if overwrite else "") + "输入昵称（最多24字）。公开成绩时会显示这个名字。", "创建存档", func(value: String): TowerRun.new_game(value, selected_slot); page = "lobby"; chosen_floor = 1; _refresh(), true)
+		return
 	var dialog := ConfirmationDialog.new()
 	dialog.title = "新建爬塔存档"
 	dialog.dialog_text = ("此槽已有记录，创建后将覆盖。\n" if overwrite else "") + "给自己起个昵称吧（最多24字）。如果之后选择公开成绩，榜单会显示这个名字。"
@@ -629,6 +660,14 @@ func _report() -> void:
 
 func _export() -> void:
 	TowerRun.save_game()
+	if OS.has_feature("web"):
+		var path := "user://web-report.json"
+		if TowerRun.export_report(path):
+			get_node("/root/TowerWeb").download(path, "ink-spire-report.json", "application/json")
+			TowerRun.notice = "浏览器已开始下载测试报告。"
+		else: TowerRun.notice = TowerRun.error
+		_refresh()
+		return
 	var dialog := FileDialog.new()
 	dialog.file_mode = FileDialog.FILE_MODE_SAVE_FILE
 	dialog.access = FileDialog.ACCESS_FILESYSTEM
@@ -644,6 +683,9 @@ func _export() -> void:
 	dialog.popup_centered_ratio(0.75)
 
 func confirm(message: String, action: Callable) -> void:
+	if MOBILE.enabled():
+		MOBILE.instance().show_help("请确认", message, "确认", action)
+		return
 	var dialog := ConfirmationDialog.new()
 	dialog.dialog_text = message
 	dialog.min_size = Vector2i(720, 210)
@@ -663,7 +705,13 @@ func _settings() -> void:
 func _quit() -> void:
 	if not TowerRun.data.is_empty():
 		if not TowerRun.save_game(): TowerRun.notice = TowerRun.error; _refresh(); return
-	get_tree().quit()
+	if OS.has_feature("web"):
+		TowerRun.telemetry.save_and_flush()
+		page = "title"
+		_refresh()
+		MOBILE.instance().show_help("进度已保存", "可以关闭这个浏览器标签页。清除网站数据会删除浏览器中的存档，换设备前请先导出迁移包。")
+		return
+	TowerRun.telemetry.request_quit()
 
 func _open_tutorial(replay: bool = false) -> void:
 	if is_instance_valid(tutorial): return
@@ -692,10 +740,14 @@ func _resume_tutorial() -> void:
 	if TowerRun.onboarding_pending(): _open_tutorial.call_deferred()
 
 func _recovery_picker() -> void:
+	if MOBILE.enabled():
+		_mobile_recovery()
+		return
 	var overlay := Control.new()
 	overlay.name = "TowerRecoveryPicker"
 	overlay.size = Vector2(1920, 1080)
 	canvas.add_child(overlay)
+	preload("res://scripts/ui/tower_mobile.gd").register_back(overlay, overlay.queue_free)
 	var shade := ColorRect.new()
 	shade.size = overlay.size
 	shade.color = Color(0.01, 0.03, 0.06, 0.82)
@@ -729,6 +781,7 @@ func _confirm_recovery(hero: String, attribute: String, picker: Control) -> void
 	overlay.name = "TowerRecoveryConfirm"
 	overlay.size = Vector2(1920, 1080)
 	canvas.add_child(overlay)
+	preload("res://scripts/ui/tower_mobile.gd").register_back(overlay, overlay.queue_free)
 	var shade := ColorRect.new()
 	shade.size = overlay.size
 	shade.color = Color(0.01, 0.03, 0.06, 0.82)
@@ -753,3 +806,76 @@ func _confirm_recovery(hero: String, attribute: String, picker: Control) -> void
 		picker.queue_free()
 		_recovery_picker.call_deferred(), true, false, box)
 	accept.name = "RecoveryAccept"
+
+func _mobile_back() -> void:
+	if page == "title": confirm("进度会保存。确定退出游戏吗？", _quit)
+	else: page = "title"; _refresh()
+
+func _mobile_choose_floor() -> void:
+	var frame := body.get_node_or_null("MobileFloorList") as Control
+	if frame == null: return
+	var overlay := Control.new()
+	overlay.name = "MobileFloorModal"
+	overlay.size = Vector2(1920, 1080)
+	body.add_child(overlay)
+	var shade := ColorRect.new()
+	shade.size = overlay.size
+	shade.color = Color(0.02, 0.03, 0.05, 0.92)
+	overlay.add_child(shade)
+	frame.reparent(overlay, false)
+	frame.position = Vector2(500, 30)
+	frame.scale = Vector2.ONE * 1.4
+	frame.show()
+	var close := button("返回", Rect2(1450, 880, 380, 120), _refresh, false, false, overlay)
+	close.add_theme_font_size_override("font_size", 36)
+	preload("res://scripts/ui/tower_mobile.gd").register_back(overlay, _refresh)
+
+func _mobile_recovery() -> void:
+	var choices: Array[Dictionary] = []
+	var ids: Array = DATA.HEROES.duplicate()
+	ids.insert(1, "zhoumingyuan@math")
+	for key in ids:
+		var hero := "zhoumingyuan" if key == "zhoumingyuan@math" else String(key)
+		var attribute := ("math" if key.ends_with("@math") else "none") if hero == "zhoumingyuan" else FightSystem.current_attribute(hero)
+		var hp := TowerRun.health(hero, attribute)
+		var maximum := FightSystem.hero_max_hp(hero)
+		var title := String(FightData.hero(hero, attribute).name) + (" · " + FightData.attr_name(attribute) if hero == "zhoumingyuan" else "")
+		choices.append({"text":"%s · 生命 %d / %d%s" % [title, hp, maximum, " · 复活" if hp <= 0 else ""], "disabled":hp >= maximum or TowerRun.recovery_charges() <= 0, "action":func():
+			confirm("使「%s」恢复到满生命，消耗1次恢复（剩余%d次）。" % [title, TowerRun.recovery_charges()], func():
+				if not TowerRun.rest(hero, attribute): TowerRun.notice = TowerRun.error
+				_refresh())})
+	MOBILE.instance().show_help("恢复 · 剩余 %d 次" % TowerRun.recovery_charges(), DATA.RECOVERY_DESCRIPTION + "每次使一人满血或复活，可以积攒。", "", Callable(), false, choices)
+
+
+func _review_import(path: String, selected_slot: int, journal_source: String = "") -> void:
+	var imported := TowerRun.TRANSFER.inspect_import(path, journal_source)
+	if imported.is_empty():
+		TowerRun.notice = "无法读取此文件：请选择尖塔存档或迁移包；原有记录未改动。"
+		_refresh()
+		return
+	if (path.begins_with("content://") or OS.has_feature("web")) and not imported.portable and journal_source.is_empty() and int(imported.save.battle_count) > 0:
+		MOBILE.instance().show_help("还需选择旧版战斗记录", "这是旧版单独存档。为保留完整历史，请再选择与它配套的 *_battles.jsonl 文件；取消不会改动已有槽位。也可以先在旧设备导出新版迁移包，再导入。", "选择战斗记录", func():
+			if OS.has_feature("web"):
+				get_node("/root/TowerWeb").pick(".jsonl", func(history: String): _review_import(path, selected_slot, history))
+				return
+			var dialog := FileDialog.new()
+			dialog.title = "选择此旧版存档的战斗记录"
+			dialog.access = FileDialog.ACCESS_FILESYSTEM
+			dialog.file_mode = FileDialog.FILE_MODE_OPEN_FILE
+			dialog.use_native_dialog = true
+			dialog.filters = PackedStringArray(["*.jsonl ; 旧版战斗记录"])
+			dialog.file_selected.connect(func(history: String): dialog.queue_free(); _review_import(path, selected_slot, history))
+			dialog.canceled.connect(dialog.queue_free)
+			add_child(dialog)
+			dialog.popup_centered())
+		return
+	var saved: Dictionary = imported.save
+	confirm("将「%s」的最高 %d 层进度导入第 %d 槽。\n原槽位会先备份，再替换；其他槽位不受影响。\n来源版本：%s" % [saved.nickname, saved.highest, selected_slot, saved.get("last_played_build", saved.get("build", "旧版"))], func():
+		if TowerRun.TRANSFER.import_bundle(path, selected_slot, journal_source): chosen_floor = int(TowerRun.data.highest) + 1
+		else: TowerRun.notice = TowerRun.error
+		_refresh())
+
+func _open_save_location() -> void:
+	if OS.has_feature("web"):
+		MOBILE.instance().show_help("浏览器存档", "进度保存在当前浏览器的网站数据中。请用「导出迁移包」下载备份，再用「导入」迁移到其他设备。")
+	else: OS.shell_open(ProjectSettings.globalize_path(TowerRun.save_root))

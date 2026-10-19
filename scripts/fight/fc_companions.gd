@@ -1,4 +1,5 @@
 extends RefCounted
+const STATUS := preload("res://scripts/fight/status_rules.gd")
 ## 陈默 / 体育生徐明明。状态留在单位上，使预览与正式结算共用规则。
 
 static func marks(unit: Dictionary) -> int:
@@ -7,7 +8,7 @@ static func marks(unit: Dictionary) -> int:
 static func gain_marks(f: RefCounted, owner: int, amount: int) -> void:
 	var unit: Dictionary = f.s.allies[owner]
 	if amount <= 0 or not f.s._is_alive(unit) or unit.statuses.has("pb_lock"): return
-	f.status(owner, "latent_marks", -1, {"name":"潜印", "desc":"弃置手牌积累，回合结束自动弃牌不增加；用于徐明明的爆发技能。", "stacks":marks(unit) + amount})
+	f.status(owner, "latent_marks", -1, {"name":"潜印", "desc":"弃置手牌积累，回合结束自动弃牌不增加；用于徐明明的爆发技能。", "stacks":marks(unit) + amount, "category":"counter"})
 
 static func consume_marks(f: RefCounted, owner: int, count: int = -1) -> Dictionary:
 	var unit: Dictionary = f.s.allies[owner]
@@ -40,7 +41,7 @@ static func reflect(f: RefCounted, owner: int, turns: int) -> void:
 	timed(f, owner, "reflect", old + turns, {"name":"反伤", "desc":"护盾吸收的伤害等量反弹给攻击者。"})
 
 static func controlled(status: Dictionary, id: String) -> bool:
-	return bool(status.get("debuff", false)) and (bool(status.get("control", false)) or id in ["stun", "freeze", "frozen", "sleep", "silence", "confusion", "immobilized"])
+	return STATUS.is_debuff(status) and (bool(status.get("control", false)) or id in ["stun", "freeze", "frozen", "sleep", "silence", "confusion", "immobilized"])
 
 static func is_controlled(unit: Dictionary) -> bool:
 	for id in unit.statuses:
@@ -258,5 +259,5 @@ static func ultimate(f: RefCounted, owner: int) -> void:
 		f.s.effect_requested.emit("ultimate_chen", "ally", owner, 0, 0)
 	else:
 		gain_marks(f, owner, 3)
-		timed(f, owner, "athlete_burst", 1, {"name":"一级运动员", "desc":"消耗潜印的伤害翻倍；无法被治疗或获得个人护盾。不可净化。", "uncleansable":true})
+		timed(f, owner, "athlete_burst", 1, {"name":"一级运动员", "desc":"消耗潜印的伤害翻倍；无法被治疗或获得个人护盾。不可净化。", "uncleansable":true, "category":"special"})
 		f.s.effect_requested.emit("ultimate_xu", "ally", owner, 0, 0)

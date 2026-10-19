@@ -10,7 +10,7 @@ func pending() -> bool:
 	return is_instance_valid(dialog)
 
 func enabled() -> bool:
-	return bool(Settings.get_value("battle", "confirm_commands", false))
+	return bool(Settings.get_value("battle", "touch_confirm_commands", true)) if preload("res://scripts/ui/tower_mobile.gd").enabled() else bool(Settings.get_value("battle", "confirm_commands", false))
 
 ## Control picking follows tree order rather than z_index. Battle rebuilds target boxes,
 ## status chips and rule buttons after this modal, so keep the modal last in the canvas;
@@ -108,6 +108,16 @@ func _offer(action: Dictionary) -> void:
 			target = FightData.target_name(String(def.target))
 	if action.has("target"):
 		target = "%s %d · %s" % ["敌人" if action.side == "enemy" else "队友", int(action.target) + 1, action.target_unit.name]
+	var mobile := preload("res://scripts/ui/tower_mobile.gd")
+	if mobile.enabled():
+		var forecast := ""
+		if action.kind == "card": forecast = preload("res://scripts/ui/battle_mobile_preview.gd").describe(_card_index(int(action.identity)), -1, int(action.get("target", -1)))
+		elif action.kind == "ultimate": forecast = preload("res://scripts/ui/battle_mobile_preview.gd").describe(-1, int(action.identity), int(action.get("target", -1)))
+		dialog = mobile.instance().show_help(title, detail + "\n" + target + "\n" + cost + "\n\n" + forecast, "确认执行", accept)
+		dialog.name = "BattleCommandConfirmation"
+		dialog.cancel_action = cancel
+		mobile.register_back(dialog, cancel)
+		return
 	dialog = Control.new()
 	dialog.name = "BattleCommandConfirmation"
 	dialog.size = Vector2(1920, 1080)
@@ -115,6 +125,7 @@ func _offer(action: Dictionary) -> void:
 	dialog.z_index = 115
 	dialog.mouse_filter = Control.MOUSE_FILTER_STOP
 	battle._ui.add_child(dialog)
+	preload("res://scripts/ui/tower_mobile.gd").register_back(dialog, cancel)
 	var shade := ColorRect.new()
 	shade.color = Color(0.025, 0.04, 0.065, 0.65)
 	shade.size = dialog.size
@@ -130,6 +141,9 @@ func _offer(action: Dictionary) -> void:
 	V.text(pane, "Enter 确认执行    ·    Esc 取消", Rect2(36, 300, 768, 26), 17, THEME.MUTED)
 	_button(pane, "取消", Rect2(36, 330, 360, 72), cancel, "CancelCommand")
 	_button(pane, "确认执行", Rect2(444, 330, 360, 72), accept, "ConfirmCommand")
+	if preload("res://scripts/ui/tower_mobile.gd").enabled():
+		pane.scale = Vector2(1.7, 1.7)
+		pane.position = (dialog.size - pane.size * pane.scale) * 0.5
 	battle._refresh()
 
 func _button(parent: Control, words: String, rect: Rect2, callback: Callable, node_name: String) -> void:
@@ -151,7 +165,8 @@ func _button(parent: Control, words: String, rect: Rect2, callback: Callable, no
 
 func _close() -> void:
 	if pending():
-		dialog.hide()
+		if dialog.has_method("dismiss"): dialog.dismiss()
+		else: dialog.hide()
 		dialog.queue_free()
 	dialog = null
 	_action = {}
@@ -164,20 +179,19 @@ func cancel() -> void:
 func accept() -> void:
 	if not pending(): return
 	var action := _action
-	print("DEBUG accept start action=", action)
 	_close() # Consume the ticket before any signals or a second click can re-enter.
 	if not FightSystem.battle_active or FightSystem.phase != FightSystem.PLAYER_TURN or int(action.encounter) != FightSystem.encounter_serial or int(action.round) != FightSystem.round:
-		print("DEBUG accept bail state")
 		FightSystem.cancel_targeting()
 		return
-	if battle._turn_interaction_locked():
-		print("DEBUG accept bail locked: impact=", Time.get_ticks_msec() < int(battle._impact_until), " motion=", battle._card_motion.busy(), " casts=", battle._active_player_casts, " fx=", (battle._player_effects_busy as Variant), " banner=", (battle._banner_busy as Variant), " queue=", (battle._turn_queue as Array).size(), " resolving=", FightSystem.resolving_action, " item_motion=", is_instance_valid(battle._item_motion), " interrupt=", (battle._enemy_interrupt_busy as Variant), " anya_queue=", (battle._anya_return_queue as Array).size(), " ally_exits=", (battle._ally_exits as Dictionary).size())
+	if FightSystem.resolving_action:
+		# Only a real rules resolution invalidates the ticket. Presentation-only
+		# locks (the hand-refresh card motion started while this modal was built)
+		# must not silently swallow the click that confirms the command.
 		FightSystem.cancel_targeting()
 		return
 	if action.has("target"):
 		var units: Array = FightSystem.enemies if action.side == "enemy" else FightSystem.allies
 		if int(action.target) >= units.size() or not is_same(units[int(action.target)], action.target_unit):
-			print("DEBUG accept bail target")
 			FightSystem.cancel_targeting()
 			return
 	var accepted := false
@@ -195,6 +209,5 @@ func accept() -> void:
 	if accepted and action.has("target"):
 		if action.side == "enemy": accepted = FightSystem.select_enemy(int(action.target))
 		else: accepted = FightSystem.select_ally(int(action.target))
-	print("DEBUG accept accepted=", accepted)
 	if not accepted: FightSystem.cancel_targeting()
 	battle._refresh()

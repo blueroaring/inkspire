@@ -102,12 +102,14 @@ func _ready() -> void:
 		else: FightSystem.choose_painting(edits)
 	)
 	paper.add_child(confirm)
+	if preload("res://scripts/ui/tower_mobile.gd").enabled():
+		_mobile_layout(paper, rail)
 	_update(false)
 	paper.modulate.a = 0.0
 	paper.position.y += 12
 	var arrival := paper.create_tween().set_parallel(true)
 	arrival.tween_property(paper, "modulate:a", 1.0, 0.18)
-	arrival.tween_property(paper, "position:y", 88.0, 0.22).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	arrival.tween_property(paper, "position:y", 20.0 if preload("res://scripts/ui/tower_mobile.gd").enabled() else 88.0, 0.22).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
 
 func _well(parent: Control, at: Vector2, color: String, diameter: float) -> void:
 	var well := V.panel(parent, Rect2(at-Vector2.ONE*3, Vector2.ONE*(diameter+6)), Color("e8dfc9"), Color("a69574"), roundi(diameter))
@@ -172,3 +174,59 @@ func _unhandled_input(event: InputEvent) -> void:
 	if inspect_only and event.is_action_pressed("ui_cancel"):
 		queue_free()
 		get_viewport().set_input_as_handled()
+
+func _mobile_layout(paper: Control, rail: Control) -> void:
+	paper.position = Vector2(30, 20)
+	paper.size = Vector2(1860, 1040)
+	for child in paper.get_children():
+		if child is Panel and child != rail: child.hide()
+	canvas.position = Vector2(40, 210)
+	canvas.size = Vector2(1120, 600)
+	rail.hide()
+	instructions.position = Vector2(40, 135)
+	instructions.size = Vector2(1120, 70)
+	instructions.add_theme_font_size_override("font_size", 32)
+	if inspect_only:
+		var legend := V.text(paper, "留白、墨色构成水墨组；朱砂、藤黄、石青构成三色组。彩色可替代原色，优先补齐三色组。\n\n同一处只计入一组，画面标记显示所属分组。", Rect2(1200, 230, 620, 580), 40, Color("3d5350"))
+		legend.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	for metric in _metrics:
+		metric.hide()
+		metric.reparent(paper, false)
+		metric.position = Vector2(1200 + _metrics.find(metric) * 310, 140)
+		metric.size = Vector2(280, 60)
+		metric.add_theme_font_size_override("font_size", 40)
+	var palette := GridContainer.new()
+	palette.columns = 2
+	palette.position = Vector2(1200, 230)
+	palette.size = Vector2(620, 500)
+	palette.add_theme_constant_override("h_separation", 20)
+	palette.add_theme_constant_override("v_separation", 20)
+	paper.add_child(palette)
+	for button in color_buttons:
+		button.reparent(palette, false)
+		button.custom_minimum_size = Vector2(290, 144)
+		button.text = SHORT_NAMES[String(choice.colors[color_buttons.find(button)])]
+		button.add_theme_font_size_override("font_size", 40)
+		for child in button.get_children(): child.hide()
+	if is_instance_valid(_undo):
+		_undo.reparent(paper, false)
+		_undo.position = Vector2(1200, 742)
+		_undo.size = Vector2(620, 144)
+		_undo.add_theme_font_size_override("font_size", 36)
+		_selection.reparent(paper, false)
+		_selection.position = Vector2(1200, 148)
+		_selection.size = Vector2(620, 70)
+		_selection.add_theme_font_size_override("font_size", 32)
+	summary.position = Vector2(40, 830)
+	summary.size = Vector2(1120, 60)
+	summary.add_theme_font_size_override("font_size", 36)
+	_footer.position = Vector2(40, 920)
+	_footer.size = Vector2(1120, 100)
+	_footer.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_footer.add_theme_font_size_override("font_size", 32)
+	confirm.position = Vector2(1200, 880)
+	confirm.size = Vector2(620, 144)
+	confirm.add_theme_font_size_override("font_size", 38)
+	preload("res://scripts/ui/tower_mobile.gd").register_back(self, func():
+		if inspect_only: queue_free()
+		else: edits.clear(); active_region = -1; _update())

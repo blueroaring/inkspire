@@ -1,4 +1,5 @@
 extends RefCounted
+const STATUS := preload("res://scripts/fight/status_rules.gd")
 ## 刘丹雅：所有区域与分组均参与正式结算；选择在确认前不修改画作。
 const COLORS := ["white", "ink", "red", "yellow", "blue", "rainbow"]
 const DYES := ["ink", "red", "yellow", "blue"]
@@ -195,7 +196,7 @@ static func _cleanse_random(f: RefCounted) -> Dictionary:
 		if not f.s._is_alive(f.s.allies[i]): continue
 		for id in f.s.allies[i].statuses:
 			var st: Dictionary = f.s.allies[i].statuses[id]
-			if bool(st.get("debuff", false)) and not bool(st.get("uncleansable", false)): options.append({"ally":i, "id":id})
+			if STATUS.is_debuff(st) and not bool(st.get("uncleansable", false)): options.append({"ally":i, "id":id})
 	if options.is_empty(): return {}
 	var picked: Dictionary = f.random_entry(options)
 	picked["name"] = String(f.s.allies[int(picked.ally)].statuses[String(picked.id)].get("name", picked.id))

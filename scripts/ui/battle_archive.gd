@@ -4,6 +4,7 @@ signal closed
 signal page_changed(key: String)
 signal item_requested(id: String)
 
+const MOBILE := preload("res://scripts/ui/tower_mobile.gd")
 const V := preload("res://scripts/ui/fc_card_visuals.gd")
 const THEME := preload("res://scripts/ui/battle_theme.gd")
 const ART := preload("res://scripts/ui/battle_archive_art.gd")
@@ -50,7 +51,11 @@ var _selected_item := ""
 var _closing := false
 
 func _ready() -> void:
+	preload("res://scripts/ui/tower_mobile.gd").register_back(self, close)
 	THEME.apply(self)
+	if MOBILE.enabled():
+		_ready_mobile()
+		return
 	name = "BattleArchive"
 	z_index = 95
 	size = Vector2(1920, 1080)
@@ -92,6 +97,9 @@ func _ready() -> void:
 func show_page(key: String) -> void:
 	if not PAGES.has(key) or _closing: return
 	page = key
+	if MOBILE.enabled():
+		_mobile_content(key)
+		return
 	_selected_tile = null
 	_detail = null
 	_clear(_body)
@@ -151,7 +159,7 @@ func _build_bestiary() -> void:
 	bestiary.position = Vector2(32, 184)
 	bestiary.size = Vector2(1544, 600)
 	_body.add_child(bestiary)
-	_footer.text = "全部怪物均可查阅 · 滚轮浏览列表与详情"
+	_footer.text = preload("res://scripts/ui/tower_mobile.gd").words("全部怪物均可查阅 · 滚轮浏览列表与详情")
 
 func _build_effects() -> void:
 	var guide := preload("res://scripts/ui/battle_mechanics.gd").new()
@@ -173,7 +181,7 @@ func _build_pile() -> void:
 	if page in ["deck", "discard"]:
 		pile.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 			return String(a.caster_id) + String(a.skill_id) < String(b.caster_id) + String(b.skill_id))
-	_footer.text = "共 %d 张   ·   点击卡牌查看右侧详情   ·   滚轮浏览" % pile.size()
+	_footer.text = preload("res://scripts/ui/tower_mobile.gd").words("共 %d 张   ·   点击卡牌查看右侧详情   ·   滚轮浏览" % pile.size())
 	var scroll := _scroll(_body, Rect2(32, 184, 1002, 600))
 	scroll.name = "PileScroll"
 	var grid := GridContainer.new()
@@ -321,7 +329,7 @@ func _build_log() -> void:
 		line.add_child(label)
 	if entries.is_empty(): _empty(_body, Rect2(364, 184, 1212, 600), "记录尚未开始", "战斗事件将在这里依次留存", "retain", GOLD)
 	else: _scroll_latest.call_deferred(log_scroll)
-	_footer.text = "伤害、治疗与回合以不同颜色区分   ·   滚轮回看较早记录"
+	_footer.text = preload("res://scripts/ui/tower_mobile.gd").words("伤害、治疗与回合以不同颜色区分   ·   滚轮回看较早记录")
 
 func _scroll_latest(scroll: ScrollContainer) -> void:
 	await get_tree().process_frame
@@ -426,6 +434,9 @@ func _build_characters() -> void:
 	_footer.text = "切换左侧角色查看资料   ·   右侧滚动查看被动、终结技、卡组与饰品"
 
 func _show_equipped_skill(skill: String, owner: String) -> void:
+	if MOBILE.enabled():
+		V.detail(self, {"skill_id":skill, "caster_id":owner})
+		return
 	var detail := DETAIL.new()
 	detail.card = {"skill_id":skill, "caster_id":owner}
 	add_child(detail)
@@ -622,6 +633,7 @@ func close() -> void:
 		queue_free())
 
 func _input(event: InputEvent) -> void:
+	if MOBILE.enabled(): return
 	if has_node("CardDetail"): return
 	if event.is_action_pressed("ui_cancel"):
 		get_viewport().set_input_as_handled()
@@ -632,3 +644,114 @@ func _input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 			close()
 
+
+func _ready_mobile() -> void:
+	name = "BattleArchive"
+	z_index = 95
+	size = Vector2(1920, 1080)
+	mouse_filter = Control.MOUSE_FILTER_STOP
+	var shade := ColorRect.new()
+	shade.color = Color(0.02, 0.04, 0.05, 0.9)
+	shade.size = size
+	add_child(shade)
+	_pane = V.panel(self, Rect2(30, 20, 1860, 1040), INK, GOLD, 8)
+	_title = _title_text(_pane, "", Rect2(40, 20, 1380, 64), 42)
+	_subtitle = V.text(_pane, "", Rect2(40, 90, 1380, 42), 28, MUTED)
+	_button(_pane, "关闭", Rect2(1530, 20, 290, 120), close, GOLD).add_theme_font_size_override("font_size", 36)
+	var tabs_scroll := _scroll(_pane, Rect2(40, 155, 1780, 138))
+	tabs_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	tabs_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	_tabs = HBoxContainer.new()
+	_tabs.add_theme_constant_override("separation", 18)
+	tabs_scroll.add_child(_tabs)
+	_body = Control.new()
+	_body.name = "ArchiveBody"
+	_body.position = Vector2(40, 320)
+	_body.size = Vector2(1780, 670)
+	_pane.add_child(_body)
+	_footer = V.text(_pane, "", Rect2(40, 998, 1780, 36), 25, MUTED)
+	show_page(initial_page)
+
+func _mobile_content(key: String) -> void:
+	_clear(_body)
+	_clear(_tabs)
+	_title.text = PAGES[key][0]
+	_subtitle.text = PAGES[key][1]
+	for tab_key in PAGES:
+		if tab_key == "calculation" and key != "calculation": continue
+		var tab := _button(_tabs, PAGES[tab_key][0], Rect2(), func(): show_page(tab_key), PAGES[tab_key][2], key == tab_key)
+		tab.name = "ArchiveTab_" + tab_key
+		tab.custom_minimum_size = Vector2(310, 120)
+		tab.add_theme_font_size_override("font_size", 34)
+		if key == tab_key:
+			(_tabs.get_parent() as ScrollContainer).set_deferred("scroll_horizontal", maxi(0, _tabs.get_child_count() - 3) * 328)
+	_footer.text = "横向滑动切换栏目 · 上下滑动阅读"
+	if key in ["settings", "bestiary", "effects", "attributes"]:
+		var component: Control
+		match key:
+			"settings":
+				component = SettingsPanel.new()
+				component.embedded = true
+			"bestiary": component = preload("res://scripts/ui/enemy_bestiary.gd").new()
+			"effects": component = preload("res://scripts/ui/battle_mechanics.gd").new()
+			_: component = ATTRIBUTE_CHART.new()
+		component.size = _body.size
+		_body.add_child(component)
+	else:
+		var scroll := _scroll(_body, Rect2(Vector2.ZERO, _body.size))
+		scroll.name = "MobileArchiveScroll"
+		var rows := VBoxContainer.new()
+		rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		rows.add_theme_constant_override("separation", 24)
+		scroll.add_child(rows)
+		if key == "log":
+			for entry in FightSystem.get_log(): _mobile_text(rows, String(entry))
+		elif key == "characters":
+			for unit in FightSystem.allies:
+				_mobile_text(rows, "%s · Lv.%d · 生命 %d / %d · %s" % [unit.name, FightProgression.hero_level(unit.id), unit.hp, unit.max_hp, FightData.attr_name(unit.attribute)], 38)
+				_mobile_text(rows, "被动：" + FightData.passive(unit.id, unit.attribute))
+				var ultimate := FightData.ultimate(unit.id, unit.attribute)
+				_mobile_text(rows, "终结技 · " + ultimate.name + "\n" + ultimate.desc)
+				for skill in FightSystem.loadout(unit.id):
+					if rows.has_node("Skill_" + unit.id + "_" + skill): continue
+					var button := _mobile_button(rows, FightData.skill(skill).name + " · 查看技能", func(): _show_equipped_skill(skill, unit.id))
+					button.name = "Skill_" + unit.id + "_" + skill
+				if unit.id == "li_anya": _mobile_button(rows, "双形态技能对照", func(): add_child(preload("res://scripts/ui/anya_form_reference.gd").new()))
+		elif key == "items":
+			var count := 0
+			for id in FightEquipmentData.CONSUMABLES:
+				var amount := Inventory.count(id, GameState.BAG_HIGHSCHOOL)
+				if amount <= 0: continue
+				count += 1
+				var definition: Dictionary = FightEquipmentData.CONSUMABLES[id]
+				_mobile_text(rows, "%s × %d\n%s" % [definition.name, amount, definition.desc])
+				var use := _mobile_button(rows, "选择目标" if definition.target != "party" else "使用道具", func(): _selected_item = id; _use_item())
+				use.name = "UseBattleItem_" + id
+				var error := FightSystem.item_error(id, -1, false)
+				use.disabled = not error.is_empty()
+				if not error.is_empty(): _mobile_text(rows, error)
+			if count == 0: _mobile_text(rows, "暂无战斗道具。可以在塔间补给点购买。")
+		else:
+			var cards := _pile(key).duplicate(true)
+			if key in ["deck", "discard"]: cards.sort_custom(func(a, b): return String(a.caster_id) + String(a.skill_id) < String(b.caster_id) + String(b.skill_id))
+			for index in cards.size():
+				var card: Dictionary = cards[index]
+				var button := _mobile_button(rows, "%02d · %s    %s    能量 %s    查看详情" % [index + 1, V.card_title(card), V.owner_name(card), str(FightSystem.card_cost(card))], func(): V.detail(self, card))
+				button.name = "ArchiveCard_%d" % index
+			if cards.is_empty(): _mobile_text(rows, "这里暂时没有卡牌。")
+	page_changed.emit(key)
+
+func _mobile_text(rows: VBoxContainer, words: String, font_size: int = 34) -> void:
+	var label := Label.new()
+	label.text = words
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	label.add_theme_font_size_override("font_size", font_size)
+	rows.add_child(label)
+
+func _mobile_button(rows: VBoxContainer, words: String, action: Callable) -> Button:
+	var button := _button(rows, words, Rect2(), action, GOLD)
+	button.custom_minimum_size = Vector2(0, 144)
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	button.add_theme_font_size_override("font_size", 34)
+	return button

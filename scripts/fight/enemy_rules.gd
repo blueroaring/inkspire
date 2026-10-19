@@ -3,6 +3,7 @@ const SUMMON_LIMIT := 4
 const CHALLENGES := preload("res://scripts/fight/enemy_challenges.gd")
 const FINALE := preload("res://scripts/fight/finale_rules.gd")
 const EXPANSION := preload("res://scripts/fight/enemy_expansion.gd")
+const STATUS := preload("res://scripts/fight/status_rules.gd")
 ## Authored monster mechanics. Runtime state lives on units / FightSystem so previews copy it.
 const IDS := ["cupid", "zeus_dean", "biting_book", "nightmare", "panic_throat", "snicker_shadow"]
 const CURSES := ["fear_spread", "mockery", "damp", "abyss", "ranking", "wound", "medicine", "shackle", "do_not_tell"]
@@ -38,9 +39,9 @@ static func setup(unit: Dictionary) -> void:
 	if String(unit.id) in CHALLENGES.IDS: CHALLENGES.setup(unit)
 	if String(unit.id) in EXPANSION.IDS: EXPANSION.setup(unit)
 	if unit.id == "snicker_shadow":
-		unit.statuses.shadow_taunt = {"name":"窃笑嘲讽", "desc":"单体敌方技能必须先选择窃笑之影；不可解除。群攻仍可命中其他敌人。", "turns":-1, "debuff":false, "uncleansable":true}
+		unit.statuses.shadow_taunt = {"name":"窃笑嘲讽", "desc":"单体敌方技能必须先选择窃笑之影；不可解除。群攻仍可命中其他敌人。", "turns":-1, "debuff":false, "uncleansable":true, "category":"rule"}
 	if unit.id == "zeus_dean":
-		unit.statuses.thunder_rule = {"name":"惩戒之雷", "desc":"每名角色每释放3次技能，敌方回合开始受到一次雷击；余数跨回合保留。终结技计数，追击不计数。", "turns":-1, "debuff":false, "uncleansable":true}
+		unit.statuses.thunder_rule = {"name":"惩戒之雷", "desc":"每名角色每释放3次技能，敌方回合开始受到一次雷击；余数跨回合保留。终结技计数，追击不计数。", "turns":-1, "debuff":false, "uncleansable":true, "category":"rule"}
 
 static func scaled(unit: Dictionary, base: float, growth: float = 0.6) -> int:
 	return roundi(base + maxi(0, int(unit.level) - 1) * growth)
@@ -348,7 +349,10 @@ static func after_damage(s: Node, target: Dictionary, result: Dictionary = {}) -
 	target.boss_phase = stage + 1
 	target.phase_pending = true
 	target.phase_rebirth = true
-	target.statuses.clear()
+	# Phase lifetime is explicit, independent of whether an effect is neutral.
+	# Li Anya's target mark belongs to her ongoing character mechanic.
+	for id in target.statuses.keys():
+		if not bool(target.statuses[id].get("persist_through_phase", false)): target.statuses.erase(id)
 	target.marks.clear()
 	target.guard = 0
 	if target.id == "inverse_limit":

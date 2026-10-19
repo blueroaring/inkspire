@@ -20,6 +20,7 @@ var audio_mixer: Node
 var voice_key := ""
 
 func _ready() -> void:
+	preload("res://scripts/ui/tower_mobile.gd").register_back(self, _finish)
 	name = "AnyaTransformation_" + kind
 	size = Vector2(1920, 1080)
 	z_index = 160

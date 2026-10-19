@@ -11,6 +11,40 @@ const DEFINITIONS := {
 	"resilience":{"name":"坚毅", "desc":"每层抵挡一次致命伤害、违纪处决或虚无离场；抵挡处决或虚无时清除对应标记或虚无。", "debuff":false}
 }
 
+## Status-box naming. Buffs and debuffs keep the classic captions; marks, rules,
+## counters and temporary special states are neither and must not pose as buffs.
+const CAPTIONS := {
+	"buff": "增 益 状 态",
+	"debuff": "负 面 状 态",
+	"mark": "标 记",
+	"rule": "战 斗 规 则",
+	"passive": "被 动",
+	"counter": "计 数",
+	"special": "特 殊 状 态",
+	"role": "角 色 状 态",
+}
+## Neutral bookkeeping is excluded from dispel/cleanse. Phase persistence is
+## a separate explicit status property, never implied by this category.
+const NEUTRAL_CATEGORIES := ["mark", "rule", "passive", "counter", "special", "role"]
+
+static func category(status: Dictionary) -> String:
+	var explicit := String(status.get("category", ""))
+	if CAPTIONS.has(explicit): return explicit
+	if String(status.get("icon", "")) in ["dead", "downed"]: return "role"
+	return "debuff" if bool(status.get("debuff", false)) else "buff"
+
+static func caption(status: Dictionary) -> String:
+	return String(CAPTIONS.get(category(status), "状 态"))
+
+static func neutral(status: Dictionary) -> bool:
+	return category(status) in NEUTRAL_CATEGORIES
+
+static func is_buff(status: Dictionary) -> bool:
+	return category(status) == "buff"
+
+static func is_debuff(status: Dictionary) -> bool:
+	return category(status) == "debuff"
+
 static func canonical(id: String) -> String:
 	return String(ALIASES.get(id, id))
 

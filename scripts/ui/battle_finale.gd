@@ -66,7 +66,9 @@ func _ready() -> void:
 	defiance.position = Vector2(1558, 776)
 	defiance.pressed.connect(func() -> void:
 		if battle._turn_interaction_locked(): return
-		present("anya_defy", func() -> void: RULES.defy(FightSystem))
+		if preload("res://scripts/ui/tower_mobile.gd").enabled() and bool(Settings.get_value("battle", "touch_confirm_commands", true)):
+			preload("res://scripts/ui/tower_mobile.gd").instance().show_help("我不接受这样的结局", defiance.tooltip_text, "确认释放", func(): present("anya_defy", func(): RULES.defy(FightSystem)))
+		else: present("anya_defy", func() -> void: RULES.defy(FightSystem))
 	)
 	add_child(defiance)
 	answer = Button.new()
@@ -98,6 +100,12 @@ func _ready() -> void:
 		button.add_theme_color_override("font_color", Color("ffe8b4"))
 		button.add_theme_color_override("font_hover_color", Color.WHITE)
 		button.tooltip_text = "永久最终增伤25%、最终减伤15%、护盾强效30%，敌方全体眩晕一回合；每次转阶段获得一次使用机会。" if button == defiance else "释放李安雅的最后一张协助牌，将希望从9提升到10。"
+	if preload("res://scripts/ui/tower_mobile.gd").enabled():
+		defiance.scale = Vector2.ONE * 2
+		defiance.position = Vector2(1710, 712)
+		answer.position = Vector2(1200, 712)
+		answer.size = Vector2(480, 144)
+		answer.add_theme_font_size_override("font_size", 36)
 	FightSystem.finale_presentation = present
 	FightSystem.finale_event.connect(_event)
 	for ally in FightSystem.allies:
@@ -296,6 +304,7 @@ func present(id: String, done: Callable, target: int = 0) -> void:
 	cinematic.z_index = 180
 	cinematic.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(cinematic)
+	preload("res://scripts/ui/tower_mobile.gd").register_back(cinematic, func(): dismiss = true)
 	var art := V.icon(cinematic, load(ROOT + id + ".webp"), Rect2(Vector2.ZERO, cinematic.size))
 	art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	art.pivot_offset = cinematic.size * 0.5

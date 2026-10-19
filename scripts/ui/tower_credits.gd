@@ -10,10 +10,14 @@ var tabs: Array[Button] = []
 var _sections := CREDITS.sections()
 
 func _ready() -> void:
+	preload("res://scripts/ui/tower_mobile.gd").register_back(self, _close)
 	name = "TowerCredits"
 	size = Vector2(1920, 1080)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	T.apply(self)
+	if preload("res://scripts/ui/tower_mobile.gd").enabled():
+		_mobile_credits()
+		return
 	var shade := ColorRect.new()
 	shade.color = Color(0.02, 0.04, 0.05, 0.86)
 	shade.size = size
@@ -67,3 +71,25 @@ func _unhandled_input(event: InputEvent) -> void:
 func _close() -> void:
 	closed.emit()
 	queue_free()
+
+func _mobile_credits() -> void:
+	var panel := M.panel(Rect2(30, 20, 1860, 1040), T.SURFACE, T.GOLD)
+	add_child(panel)
+	heading = M.heading(panel, "制作名单与许可", Rect2(40, 20, 1100, 90), 46)
+	var picker := OptionButton.new()
+	picker.position = Vector2(40, 130)
+	picker.size = Vector2(1760, 144)
+	picker.add_theme_font_size_override("font_size", 40)
+	for section in _sections: picker.add_item(section.title)
+	picker.item_selected.connect(_select)
+	panel.add_child(picker)
+	content = RichTextLabel.new()
+	content.position = Vector2(40, 310)
+	content.size = Vector2(1760, 490)
+	content.add_theme_font_size_override("normal_font_size", 38)
+	content.add_theme_color_override("default_color", T.TEXT)
+	panel.add_child(content)
+	var close := M.button("返回游戏", Rect2(40, 850, 1760, 144), _close, T.GOLD)
+	close.add_theme_font_size_override("font_size", 40)
+	panel.add_child(close)
+	_select(0)
